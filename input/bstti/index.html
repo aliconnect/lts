@@ -1,0 +1,36 @@
+
+<html>
+<head>
+  <link rel="stylesheet" href="/src/css/web.css" />
+  <link rel="stylesheet" href="/src/css/icon.css" />
+  <link rel="stylesheet" href="css/bstti.css" />
+  <script src="/api/src/js/aim.js"></script>
+  <script src="/api/src/js/web.js"></script>
+  <!-- <script src="pdf.worker.js" async></script> -->
+  <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+  <script src="//mozilla.github.io/pdf.js/build/pdf.worker.js" async></script>
+  <script src="js/bstti.js"></script>
+  <script src="js/operations.js"></script>
+</head>
+<body class="col">
+  <div class="row">
+    <progress id="progress"></progress>
+    <!-- <progress id="analyseProgress"></progress> -->
+    <a target="example" id="urlLink">PDF Document</a>
+    <a target="example" href="bstti.yaml">YAML</a>
+    <a target="example" href="?make=html">HTML</a>
+    <a target="example" href="?make=config">config</a>
+    <button onclick="convert();">convert pdf</button>
+  </div>
+  <div class="row aco main" style="height:0;">
+    <div id="spec" class="oa" spellcheck="false"></div>
+    <div class="oa">
+      <!-- <pre id="eis"></pre> -->
+      <pre id="config"></pre>
+      <pre id="api"></pre>
+      <pre id="js"></pre>
+      <pre id="st"></pre>
+    </div>
+  </div>
+</body>
+</html>

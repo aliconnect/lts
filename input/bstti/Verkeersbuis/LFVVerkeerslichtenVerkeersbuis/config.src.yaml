@@ -1,0 +1,8 @@
+---
+components:
+  schemas:
+    LFVVerkeerslichtenVerkeersbuis:
+      operations:
+        setHandStand:
+          description: de stand van de verkeerslichten in
+...

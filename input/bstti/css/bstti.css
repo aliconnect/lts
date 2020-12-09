@@ -1,0 +1,18 @@
+html,body{
+  height:100%;
+}
+pre {
+  margin:0;
+  padding:5px;
+  border:solid 1px #ccc;
+  white-space: pre-wrap;
+}
+pre div {
+  font: inherit;
+}
+.main>div{
+  flex-basis: 50%;
+}
+#spec {
+  overflow-x: hidden;
+}

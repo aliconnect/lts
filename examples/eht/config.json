@@ -1,0 +1,10 @@
+{
+  "config": {
+    "debug": true,
+    "aim": {
+      "servers": [
+        {"url": "https://rws.aliconnect.nl/tms/eht/api"}
+      ]
+    }
+  }
+}

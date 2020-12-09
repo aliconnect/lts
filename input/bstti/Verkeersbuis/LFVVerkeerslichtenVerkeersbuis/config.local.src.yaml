@@ -1,0 +1,9 @@
+---
+components:
+  schemas:
+    LFVVerkeerslichtenVerkeersbuis:
+      operations:
+        setHandStand:
+          description: de stand van de verkeerslichten in. De LFV moet deze stand in stappen
+            realiseren, in overeenstemming met eis BSTTI#16902
+...

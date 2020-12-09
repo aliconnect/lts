@@ -1,0 +1,4 @@
+@call start Verkeersbuis\Verkeerslichten 9004^
+ --load=data^
+ --config-aim-websocket-url=ws://localhost:9003^
+ --auth-access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJzaGEyNTYifQ.eyJpc3MiOiJyd3MuYWxpY29ubmVjdC5ubCIsInNjb3BlIjoid2Vic2l0ZS5yZWFkIG5hbWUgZW1haWwiLCJzdWIiOiIzNDQzNzg3IiwiYXVkIjoiMzY2NjEzNCIsImV4cCI6MTYwNTg2MjI1MSwiaWF0IjoxNjA1Nzc1ODUxfQ.wESRRvjvb88XzZBwjlWwn1KhBwjBTTXuPCAR6_OfQuw

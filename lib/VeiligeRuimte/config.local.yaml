@@ -1,0 +1,375 @@
+---
+components:
+  schemas:
+    VeiligeRuimte_Verlichting:
+      naam: Basisfunctie Verlichting Veilige Ruimte
+      hoortbij: Veilige ruimte
+      titel: Verlichting
+      properties:
+        LfvVerlichting:
+          stereotype: configuratie_element
+          title: LFV Verlichting Veilige Ruimte
+          description: De LFV Verlichting Veilige Ruimte.
+          ref: BSTTI#6735
+          type: selectitem
+          class: ""
+          bstti_name: lfv_Verlichting_VeiligeRuimte
+        MaxTransitietijdVvr:
+          stereotype: configuratie_element
+          title: Maximale transitietijd
+          description: De tijd die een standsverandering van de Verlichting Veilige
+            Ruimte maximaal mag duren. Dit configuratie - element moet instelbaar
+            zijn via een onderhoudskoppelvlak.
+          ref: BSTTI#10041
+          type: number
+          unit: s
+          enum:
+          - 0
+          - 1
+          - 5
+          - 10
+          min: 0
+          max: 60
+          step: 1
+          bstti_name: max_transitietijd_vvr
+        Bedieningswijze:
+          stereotype: variabele
+          title: Bedieningswijze
+          description: De huidige bedieningswijze van Verlichting Veilige Ruimte.
+          ref: BSTTI#8805
+          comment: ""
+          enum:
+            hand: Hand
+            auto: Auto
+          bstti_name: bedieningswijze
+        AutoStand:
+          stereotype: variabele
+          title: Automatische stand
+          description: 'De stand die de Verlichting Veilige Ruimte moet handhaven
+            als #bedieningswijze = auto.'
+          ref: BSTTI#8806
+          comment: ""
+          enum:
+            aan: Aan
+            uit: Uit
+          bstti_name: auto_stand
+        HandStand:
+          stereotype: variabele
+          title: Handmatige stand
+          description: 'De stand die de Verlichting Veilige Ruimte moet handhaven
+            als #bedieningswijze = hand.'
+          ref: BSTTI#8808
+          comment: 'Init: init_patroon(#stand <> ongeldig, #stand)'
+          enum:
+            aan: Aan
+            uit: Uit
+          bstti_name: hand_stand
+          initvalue: 'init_patroon(#stand <> ongeldig, #stand)'
+        Stand:
+          stereotype: variabele
+          title: Stand
+          description: De huidige stand van de Verlichting Veilige Ruimte.
+          ref: BSTTI#8826
+          comment: 'Conditie: _lfv_vvr.#observeerbaar = ja ; Waarde: _lfv_vvr.#stand'
+          bstti_name: stand
+          rules:
+          - conditie: _lfv_vvr.#observeerbaar = JA
+            waarde: _lfv_vvr.#stand
+          js: |
+            if (_lfv_vvr.#observeerbaar = JA) {
+              return _lfv_vvr.#stand
+            }
+        Beschikbaarheid:
+          title: Beschikbaarheid
+          description: Geeft de beschikbaarheid van de verlichting veilige ruimte
+            weer.
+          ref: BSTTI#9274
+          comment: 'Status: #beschikbaarheid'
+          type: status_melding
+          enum:
+            niet_beschikbaar: Niet beschikbaar
+            beschikbaar: Beschikbaar
+            beperkt_beschikbaar: Beperkt beschikbaar
+          bstti_name: Beschikbaarheid
+        TransitiestatusTijdstip:
+          stereotype: variabele
+          title: Tijdstip transitie bereikt
+          description: Het tijdstip waarop de huidige transitiestatus-waarde van de
+            Verlichting Veilige Ruimte bereikt is.
+          ref: BSTTI#10042
+          comment: ""
+          bstti_name: transitiestatus_tijdstip
+        Transitiestatus:
+          stereotype: variabele
+          title: Transitiestatus
+          description: Geeft de transitiestatus van de Verlichting Veilige Ruimte
+            aan.
+          ref: BSTTI#8828
+          comment: 'Conditie: * ; Waarde: transitiestatus_patroon((#bedieningswijze
+            = auto && #stand = #auto_stand) || (#bedieningswijze = hand && #stand
+            = #hand_stand), IF #bedieningswijze = auto THEN #auto_stand ELSIF #bedieningswijze
+            = hand THEN #hand_stand END_IF, #transitiestatus_tijdstip, _max_transitietijd_vvr
+            )'
+          enum:
+            bereikt: Bereikt
+            niet_bereikt: Niet bereikt
+            in_transitie: In transitie
+          bstti_name: transitiestatus
+          rules:
+          - conditie: '*'
+            waarde: 'transitiestatus_patroon((#bedieningswijze = AUTO && #stand =
+              #auto_stand) || (#bedieningswijze = HAND && #stand = #hand_stand), IF
+              #bedieningswijze = AUTO THEN #auto_stand ELSIF #bedieningswijze = HAND
+              THEN #hand_stand END_IF, #transitiestatus_tijdstip, _MAX_TRANSITIETIJD_VVR
+              )'
+          js: |
+            if (*) {
+              return transitiestatus_patroon((#bedieningswijze = AUTO && #stand = #auto_stand) || (#bedieningswijze = HAND && #stand = #hand_stand), IF #bedieningswijze = AUTO THEN #auto_stand ELSIF #bedieningswijze = HAND THEN #hand_stand END_IF, #transitiestatus_tijdstip, _MAX_TRANSITIETIJD_VVR )
+            }
+        PlaatselijkBediend:
+          stereotype: variabele
+          title: Plaatselijk bediend
+          description: De Verlichting Veilige Ruimte kan plaatselijk bediend worden.
+          ref: BSTTI#16752
+          comment: 'Conditie: * ; Waarde: _lfv_vvr.#bestuurbaar = nee && _lfv_vvr.#reden_niet_bestuurbaar[i]
+            = plaatselijke_bediening'
+          enum:
+            ja: Ja
+            nee: Nee
+          bstti_name: plaatselijk_bediend
+          rules:
+          - conditie: '*'
+            waarde: _lfv_vvr.#bestuurbaar = NEE && _lfv_vvr.#reden_niet_bestuurbaar[i]
+              = PLAATSELIJKE_BEDIENING
+          js: |
+            if (*) {
+              return _lfv_vvr.#bestuurbaar = NEE && _lfv_vvr.#reden_niet_bestuurbaar[i] = PLAATSELIJKE_BEDIENING
+            }
+        AlarmNietBestuurbaarWegensStoring:
+          title: Alarm niet bestuurbaar wegens storing
+          description: Voor elke LFV en elke component dient een instantie van volgende
+            generieke signalering van het type deelsysteem_alarm te signaleren wanneer
+            deze niet-bestuurbaar is vanwege een storing.
+          ref: BSTTI#14297
+          comment: 'Conditie: _lfv.#bestuurbaar = nee && _lfv.#reden_niet_bestuurbaar[i]
+            = storing'
+          type: deelsysteem_alarm
+          enum:
+            ja: Niet bestuurbaar wegens storing
+            nee: ""
+          bstti_name: Alarm_NietBestuurbaarWegensStoring
+          rules:
+          - conditie: _lfv.#bestuurbaar = NEE && _lfv.#reden_niet_bestuurbaar[i] =
+              STORING
+          js: "if (_lfv.#bestuurbaar = NEE && _lfv.#reden_niet_bestuurbaar[i] = STORING)
+            {\n  return \n}\n"
+        StoringAlgemeen:
+          title: Storing algemeen
+          description: Voor elke LFV en elke component dient een instantie van volgende
+            generieke signalering van het type deelsysteem_storing te signaleren wanneer
+            deze de storing STORING_ALGEMEEN heeft.
+          ref: BSTTI#16272
+          comment: 'Conditie: _lfv.#storingen[i] = STORING_ALGEMEEN'
+          type: deelsysteem_storing
+          enum:
+            ja: Storing algemeen
+            nee: ""
+          bstti_name: Storing_Algemeen
+          rules:
+          - conditie: _lfv.#storingen[i] = STORING_ALGEMEEN
+          js: "if (_lfv.#storingen[i] = STORING_ALGEMEEN) {\n  return \n}\n"
+        StoringCommunicatieUitgevallen:
+          title: Storing communicatie uitgevallen
+          description: Voor elke LFV en elke component dient een instantie van volgende
+            generieke signalering van het type deelsysteem_storing te signaleren wanneer
+            de communicatie tussen LFV-stuurprogramma en de deelinstallatie ter plaatse
+            is uitgevallen (zie BSTTI#3739).
+          ref: BSTTI#17107
+          comment: 'Conditie: _lfv_.#storingen[i] = STORING_COMMUNICATIE_UITGEVALLEN'
+          type: deelsysteem_storing
+          enum:
+            ja: Storing communicatie uitgevallen
+            nee: ""
+          bstti_name: Storing_CommunicatieUitgevallen
+          rules:
+          - conditie: _lfv_.#storingen[i] = STORING_COMMUNICATIE_UITGEVALLEN
+          js: "if (_lfv_.#storingen[i] = STORING_COMMUNICATIE_UITGEVALLEN) {\n  return
+            \n}\n"
+        TransitiestatusVerlichting:
+          title: Transitiestatus
+          description: De transitiestatus van de verlichting veilige ruimte.
+          ref: BSTTI#8830
+          comment: 'Status: #transitiestatus'
+          type: status_melding
+          enum:
+            bereikt: Bereikt
+            in_transitie: In transitie
+            niet_bereikt: Niet bereikt
+          bstti_name: TransitiestatusVerlichtingVeiligeRuimte
+        BedieningsStatus:
+          title: Bedieningsstatus
+          description: Geeft de bedieningswijze van de verlichting veilige ruimte
+            weer.
+          ref: BSTTI#8823
+          comment: 'Status: #bedieningswijze'
+          type: status_melding
+          enum:
+            hand: Hand
+            auto: Auto
+          bstti_name: BedieningsStatus
+        AlarmBereiktFunctieNiveauNietVerlichting:
+          title: Alarm bereikt functie niveau niet.
+          description: Geeft een alarm als de functie niet in staat is op tijd het
+            gevraagde functieniveau te halen.
+          ref: BSTTI#8832
+          comment: 'Conditie: #transitiestatus = niet_bereikt'
+          type: deelsysteem_alarm
+          enum:
+            ja: Ja
+            nee: Nee
+          bstti_name: Alarm_BereiktFunctieNiveauNiet_VerlichtingVeiligeRuimte
+          rules:
+          - conditie: '#transitiestatus = NIET_BEREIKT'
+          js: "if (#transitiestatus = NIET_BEREIKT) {\n  return \n}\n"
+        AlarmOnderFunctioneelBenodigdeCapaciteitVerlichting:
+          title: Alarm onder functioneel benodigde capaciteit.
+          description: Geeft een alarm als de functie niet beschikbaar is.
+          ref: BSTTI#8824
+          comment: 'Conditie: #beschikbaarheid = niet_beschikbaar'
+          type: deelsysteem_alarm
+          enum:
+            ja: Ja
+            nee: Nee
+          bstti_name: Alarm_OnderFunctioneelBenodigdeCapaciteit_VerlichtingVeiligeRuimte
+          rules:
+          - conditie: '#beschikbaarheid = NIET_BESCHIKBAAR'
+          js: "if (#beschikbaarheid = NIET_BESCHIKBAAR) {\n  return \n}\n"
+        PlaatselijkeBedieningsStatus:
+          title: Plaatselijke bediening status
+          description: status van de plaatselijke bediening van de verlichting veilige
+            ruimte.
+          ref: BSTTI#16753
+          comment: 'Status: #plaatselijk_bediend'
+          type: status_melding
+          enum:
+            ja: Plaatselijk bediend
+            nee: Niet plaatselijk bediend
+          bstti_name: PlaatselijkeBedieningsStatus
+      operations:
+        setOpAutobediening:
+          stereotype: bediening
+          title: Zet op autobediening
+          description: Verlichting Veilige Ruimte gaat op autobediening en volgt de
+            instelling voor de autobediening (d.m.v. autonoom proces *HandhaafInstellingen).
+          ref: BSTTI#8816
+          comment: 'Conditie: * ; Acties: #bedieningswijze:= auto'
+          bstti_name: SetOpAutobediening
+          rules:
+          - conditie: '*'
+            actie:
+            - '#bedieningswijze:= AUTO'
+          js: |
+            if (true) {
+              #bedieningswijze:= AUTO;
+            }
+        setOpHandbediening:
+          stereotype: bediening
+          title: Zet op handbediening
+          description: Verlichting Veilige Ruimte gaat op handbediening en volgt de
+            instelling voor de handbediening (d.m.v. autonoom proces *HandhaafInstellingen).
+          ref: BSTTI#8817
+          comment: 'Conditie: #bedieningswijze <> hand ; Acties: #hand_stand:= #auto_stand
+            ; #bedieningswijze:= hand'
+          bstti_name: SetOpHandbediening
+          rules:
+          - conditie: '#bedieningswijze <> HAND'
+            actie:
+            - '#hand_stand:= #auto_stand'
+            - '#bedieningswijze:= HAND'
+          js: |
+            if (#bedieningswijze <> HAND) {
+              #hand_stand:= #auto_stand;
+              #bedieningswijze:= HAND;
+            }
+        setHandbedieningsStand:
+          stereotype: bediening
+          title: Zet handbediening stand
+          description: "Zet de hand-stand van Verlichting Veilige Ruimte op de aangegeven
+            stand. Deze stand wordt via autonoom proces *HandhaafInstellingen ge\xEBffectueerd."
+          ref: BSTTI#8837
+          comment: 'Conditie: * ; Acties: #hand_stand:= stand'
+          bstti_name: SetHandbedieningsStand
+          rules:
+          - conditie: '*'
+            actie:
+            - '#hand_stand:= STAND'
+          js: |
+            if (true) {
+              #hand_stand:= STAND;
+            }
+        setAutobedieningsStand:
+          stereotype: besturing
+          title: Zet autobediening stand
+          description: "Zet de auto-stand van Verlichting Veilige Ruimte op de aangegeven
+            stand. Deze stand wordt via autonoom proces *HandhaafInstellingen ge\xEBffectueerd."
+          ref: BSTTI#8818
+          comment: 'Conditie: * ; Acties: #auto_stand:= stand'
+          bstti_name: SetAutobedieningsStand
+          rules:
+          - conditie: '*'
+            actie:
+            - '#auto_stand:= STAND'
+          js: |
+            if (true) {
+              #auto_stand:= STAND;
+            }
+        handhaafInstellingen:
+          stereotype: autonoom_proces
+          title: Handhaaf instellingen
+          description: Zorgt dat de hand- of auto-instellingen worden gehandhaafd
+            afhankelijk van de status waarin de LFV zich bevindt. Dit autonome proces
+            draagt er ook zorg voor dat bij de overgang van niet bestuurbaarheid naar
+            bestuurbaarheid het juiste gedrag vertoond wordt, d.w.z. het gedrag van
+            de stand waarin de functie stond op het moment dat de LFV onbestuurbaar
+            werd.
+          ref: BSTTI#8820
+          comment: 'Conditie: _lfv_vvr.#bestuurbaar = ja && #bedieningswijze = auto
+            && #auto_stand = aan ; Acties: _lfv_vvr.Aan() ; Conditie: _lfv_vvr.#bestuurbaar
+            = ja && #bedieningswijze = auto && #auto_stand = uit ; Acties: _lfv_vvr.Uit()
+            ; Conditie: _lfv_vvr.#bestuurbaar = ja && #bedieningswijze = hand && #hand_stand
+            = aan ; Acties: _lfv_vvr.Aan() ; Conditie: _lfv_vvr.#bestuurbaar = ja
+            && #bedieningswijze = hand && #hand_stand = uit ; Acties: _lfv_vvr.Uit()'
+          bstti_name: HandhaafInstellingen
+          rules:
+          - conditie: '_lfv_vvr.#bestuurbaar = JA && #bedieningswijze = AUTO && #auto_stand
+              = AAN'
+            actie:
+            - _lfv_vvr.Aan()
+          - conditie: '_lfv_vvr.#bestuurbaar = JA && #bedieningswijze = AUTO && #auto_stand
+              = UIT'
+            actie:
+            - _lfv_vvr.Uit()
+          - conditie: '_lfv_vvr.#bestuurbaar = JA && #bedieningswijze = HAND && #hand_stand
+              = AAN'
+            actie:
+            - _lfv_vvr.Aan()
+          - conditie: '_lfv_vvr.#bestuurbaar = JA && #bedieningswijze = HAND && #hand_stand
+              = UIT'
+            actie:
+            - _lfv_vvr.Uit()
+          js: |
+            if (_lfv_vvr.#bestuurbaar = JA && #bedieningswijze = AUTO && #auto_stand = AAN) {
+              _lfv_vvr.Aan();
+            }
+            if (_lfv_vvr.#bestuurbaar = JA && #bedieningswijze = AUTO && #auto_stand = UIT) {
+              _lfv_vvr.Uit();
+            }
+            if (_lfv_vvr.#bestuurbaar = JA && #bedieningswijze = HAND && #hand_stand = AAN) {
+              _lfv_vvr.Aan();
+            }
+            if (_lfv_vvr.#bestuurbaar = JA && #bedieningswijze = HAND && #hand_stand = UIT) {
+              _lfv_vvr.Uit();
+            }
+      type: basis_functie
+      bstti_name: VerlichtingVeiligeRuimte
+...

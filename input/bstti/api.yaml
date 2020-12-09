@@ -1,0 +1,99 @@
+---
+paths:
+  /Hoogtedetectie(id)/ResetWaarschuwingsfase():
+    post:
+      operationId: Hoogtedetectie_ResetWaarschuwingsfase(id)
+  /Hoogtedetectie(id)/Enable():
+    post:
+      operationId: Hoogtedetectie_Enable(id)
+  /Hoogtedetectie(id)/ResetRoodfase():
+    post:
+      operationId: Hoogtedetectie_ResetRoodfase(id)
+  /Hoogtedetectie(id)/Disable():
+    post:
+      operationId: Hoogtedetectie_Disable(id)
+  /Hoogtedetector(id)/SetEnabled():
+    post:
+      operationId: Hoogtedetector_SetEnabled(id)
+  /Hoogtedetector(id)/SetDisabled():
+    post:
+      operationId: Hoogtedetector_SetDisabled(id)
+  /SOS(id)/EnableSpookrijderDetectie():
+    post:
+      operationId: SOS_EnableSpookrijderDetectie(id)
+  /SOS(id)/DisableSpookrijderDetectie():
+    post:
+      operationId: SOS_DisableSpookrijderDetectie(id)
+  /SOS(id)/EnableEnHandStopOnderdrukkenSosSectie():
+    post:
+      operationId: SOS_EnableEnHandStopOnderdrukkenSosSectie(id)
+  /SOS(id)/DisableSosSectie():
+    post:
+      operationId: SOS_DisableSosSectie(id)
+  /SOS(id)/HandStartOnderdrukkenMeldingen():
+    post:
+      operationId: SOS_HandStartOnderdrukkenMeldingen(id)
+  /SOS(id)/HandStopOnderdrukkenMeldingen():
+    post:
+      operationId: SOS_HandStopOnderdrukkenMeldingen(id)
+description: |
+  Geeft aan of deze instantie van basisfunctie hoogtedetector daadwerkelijk in gebruik is.
+enum:
+- ja
+- nee
+- onbekend
+- uit
+- wacht
+- aanvraag
+waarde:
+- conditie:
+  - in_gebruik = ja
+  - enabled = ja
+  - hoogte_overschrijding = (nee | ja)
+  - in_gebruik = ja
+  waarde: ja
+- conditie:
+  - in_gebruik = ja
+  - enabled = nee
+  - hoogte_overschrijding = detector_disabled
+  - in_gebruik = nee
+  waarde: ja
+- conditie:
+  - in_gebruik = nee
+  - hoogte_overschrijding = detector_disabled
+  waarde: nee
+- conditie:
+  - overige situaties
+  waarde: onbekend
+options:
+  tonen:
+    description: Het beeld van dit kanaal moet worden getoond op de videowand.
+  voorbereiden:
+    description: Het tonen van het beeld van dit kanaal moet worden voorbereid.
+components:
+  schemas:
+    Hoogtedetector:
+      properties:
+        '#daadwerkelijk_in_gebruik':
+          description: |
+            Geeft aan of deze instantie van basisfunctie hoogtedetector daadwerkelijk in gebruik is.
+          enum:
+          - ja
+          - nee
+          - onbekend
+Hoogtedetector:
+  SetDisabled:
+    operationId: Hoogtedetector(id).SetDisabled()
+    description: Disable de functie hoogtedetector. Het autonome gedrag van de LFV
+      wordt nu uitgeschakeld.
+    actie:
+    - als: |-
+        _lfv_hd.#bestuurbaar = ja &&
+          _lfv_hd.#hoogte_overschrijding <> detector_disabled
+      dan:
+      - _lfv_hd.SetHoogteOverschrijding(detector_disabled)
+      - '  #enabled := nee'
+    - als: _lfv_hd.#bestuurbaar = nee
+      dan:
+      - '#enabled := nee'
+...

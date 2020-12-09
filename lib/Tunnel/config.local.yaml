@@ -1,0 +1,408 @@
+---
+components:
+  schemas:
+    Tunnel:
+      properties:
+        Verkeersbuis:
+          stereotype: configuratie_element
+          title: cf Verkeersbuis
+          description: "De co\xF6rdinerende functies Verkeersbuis van een Twee-Buis
+            tunnel. Merk op dat als de ene verkeersbuis de index vb heeft, de andere
+            de index 3 - vb heeft."
+          ref: BSTTI#10804
+          type: selectitem
+          schema: Verkeersbuis
+          bstti_name: cf_Verkeersbuis_Tunnel
+          label: Tunnel_TweeBuisStateControle
+        OverdrukvoorzieningGrensruimte:
+          stereotype: configuratie_element
+          title: bf Overdruk grensruimtes
+          description: De basisfuncties Overdrukvoorziening Grensruimte van de tunnel.
+            Een installatie kan gebruikt worden voor meerdere ruimtes.
+          ref: BSTTI#11491
+          type: selectitem
+          schema: ???
+          bstti_name: bf_OverdrukvoorzieningGrensruimte_Tunnel
+          label: Tunnel_TweeBuisStateControle
+        Blusvoorziening:
+          stereotype: configuratie_element
+          title: bf Blusvoorziening
+          description: De instantie van de basisfunctie bluswatervoorziening.
+          ref: BSTTI#16126
+          type: selectitem
+          schema: ???
+          bstti_name: bf_Blusvoorziening_Tunnel
+          label: Tunnel_TweeBuisStateControle
+        CADO:
+          stereotype: configuratie_element
+          title: bf CaDo
+          description: De basisfuncties van de CaDo's die aan de verkeersbuizen grenzen.
+          ref: BSTTI#17066
+          type: selectitem
+          schema: ???
+          bstti_name: bf_CADO_Tunnel
+          label: Tunnel_TweeBuisStateControle
+        VEVA:
+          stereotype: configuratie_element
+          title: bf VeVa
+          description: De basisfuncties van de VeVa's die worden ontgrendeld bij uitval
+            van 3B.
+          ref: BSTTI#16955
+          type: selectitem
+          schema: ???
+          bstti_name: bf_VEVA_Tunnel
+          label: Tunnel_TweeBuisStateControle
+        CCTV:
+          stereotype: configuratie_element
+          title: cf CCTV tunnel
+          description: "De co\xF6rdinerende functie CCTV Tunnel."
+          ref: BSTTI#14619
+          type: selectitem
+          schema: ???
+          bstti_name: cf_CCTV_Tunnel
+          label: Tunnel_TweeBuisStateControle
+        CalamiteitTijd:
+          stereotype: configuratie_element
+          title: Calamiteit tijd
+          description: De tijdsduur waarna een tunnel waarin een mogelijke calamiteit
+            gedetecteerd is naar calamiteitenbedrijf gezet moet worden. Deze tijdsduur
+            dient maximaal 30 seconden te zijn. Dit configuratie - element moet instelbaar
+            zijn via een onderhoudskoppelvlak.
+          ref: BSTTI#11471
+          type: number
+          unit: s
+          min: "0"
+          max: "30"
+          step: "1"
+          bstti_name: calamiteit_tijd
+          label: Tunnel_TweeBuisStateControle
+        SignaleringenTunnel:
+          stereotype: configuratie_element
+          title: Signaleringen
+          description: 'De lijst van signaleringen voor de  ''overige tunnelfuncties'':
+            dit omvat alle signaleringen die niet in een van de categorieen verkeersbuis,
+            veilige ruimte of dienstgebouw thuishoren.'
+          ref: BSTTI#16809
+          type: selectitem
+          bstti_name: signaleringen_tunnel
+          label: Tunnel_TweeBuisStateControle
+        State:
+          stereotype: variabele
+          title: State
+          description: De samengevatte state van de verkeersbuizen. De waarde 'deel_bedrijf'
+            geeft aan dat een verkeersbuis zich in substate 'bedrijf_normaal' of 'bedrijf_standby'
+            bevindt en een (andere) buis zich in een andere substate bevindt (typisch
+            'onderhoud_regulier', 'onderhoud_herstel', of 'gestart').
+          ref: BSTTI#16789
+          comment: 'Init: gestart'
+          enum:
+            gestart: Gestart
+            bedrijf: Bedrijf
+            calamiteit: Calamiteit
+            onderhoud: Onderhoud
+            deel_bedrijf: Deelbedrijf
+          bstti_name: state
+          initvalue: GESTART
+          label: Tunnel_TweeBuisStateControle
+      operations:
+        resetOnderdrukkingen:
+          stereotype: bediening
+          title: Reset onderdrukkingen
+          description: Stop het onderdrukken van alle signaleringen van de 'overige
+            tunnelfuncties' (d.w.z. niet behorend tot verkeersbuis, veilige ruimte
+            of dienstgebouw).
+          ref: BSTTI#16810
+          comment: 'Conditie: * ; Acties: _signaleringen[].StopOnderdrukken()'
+          bstti_name: ResetOnderdrukkingen
+          rules:
+          - conditie: '*'
+            actie:
+            - _signaleringen[].StopOnderdrukken()
+          js: |
+            if (true) {
+              _signaleringen[].StopOnderdrukken();
+            }
+          label: Tunnel_TweeBuisStateControle
+        tunnelActiesBijCalamiteit:
+          stereotype: besturing
+          title: Tunnel acties bij calamiteit
+          description: De acties voor de state-overgang naar Calamiteit.
+          ref: BSTTI#10820
+          comment: 'Conditie: * ; Acties: ; ResetOnderdrukkingen() ; _bf_CaDo[].!Alarm_CaDoNietGesloten.StartOnderdrukken()
+            ; _bf_Overdruk_grensruimtes[].SetAutobedieningsStand(aan) ; _bf_Overdruk_grensruimtes[].SetOpAutobediening()
+            ; _cf_CCTV_systeem.SetVerkeersbuisDetailKanaalDerden(vb) ; _cf_CCTV_systeem.SetDoorgifteKanaalDerden(aan)
+            ; _bf_Blusvoorziening.SetHandVraag(bewaken) ; _bf_VeVa[].VergrendelPlaatselijkeBediening()'
+          bstti_name: TunnelActiesBijCalamiteit
+          rules:
+          - conditie: '*'
+            actie:
+            - ""
+            - ResetOnderdrukkingen()
+            - _bf_CaDo[].!Alarm_CaDoNietGesloten.StartOnderdrukken()
+            - _bf_Overdruk_grensruimtes[].SetAutobedieningsStand(AAN)
+            - _bf_Overdruk_grensruimtes[].SetOpAutobediening()
+            - _cf_CCTV_systeem.SetVerkeersbuisDetailKanaalDerden(VB)
+            - _cf_CCTV_systeem.SetDoorgifteKanaalDerden(AAN)
+            - _bf_Blusvoorziening.SetHandVraag(BEWAKEN)
+            - _bf_VeVa[].VergrendelPlaatselijkeBediening()
+          js: |
+            if (true) {
+              ResetOnderdrukkingen();
+              TweeBuisStateControle.CaDo[].!Alarm_CaDoNietGesloten.StartOnderdrukken();
+              TweeBuisStateControle.Overdruk_grensruimtes[].SetAutobedieningsStand(AAN);
+              TweeBuisStateControle.Overdruk_grensruimtes[].SetOpAutobediening();
+              _cf_CCTV_systeem.SetVerkeersbuisDetailKanaalDerden(VB);
+              _cf_CCTV_systeem.SetDoorgifteKanaalDerden(AAN);
+              TweeBuisStateControle.Blusvoorziening.SetHandVraag(BEWAKEN);
+              TweeBuisStateControle.VeVa[].VergrendelPlaatselijkeBediening();
+            }
+          label: Tunnel_TweeBuisStateControle
+        tunnelActiesBijBedrijfOfOnderhoud:
+          stereotype: besturing
+          title: Tunnel acties bij bedrijf of onderhoud
+          description: De acties voor de state-overgang naar Bedrijf of Onderhoud.
+          ref: BSTTI#10821
+          comment: 'Conditie: * ; Acties: ; ResetOnderdrukkingen() ; IF #state = onderhoud
+            THEN ; _bf_CaDo[].!Alarm_CaDoNietGesloten.StartOnderdrukken() ; END_IF
+            ; _bf_Overdruk_grensruimtes[].SetAutobedieningsStand(aan) ; _bf_Overdruk_grensruimtes[].SetOpAutobediening()
+            ; _cf_CCTV_systeem.SetDoorgifteKanaalDerden(uit) ; _bf_Blusvoorziening.SetHandVraag(bewaken)
+            ; _bf_VeVa[].VergrendelPlaatselijkeBediening()'
+          bstti_name: TunnelActiesBijBedrijfOfOnderhoud
+          rules:
+          - conditie: '*'
+            actie:
+            - ""
+            - ResetOnderdrukkingen()
+            - 'IF #state = ONDERHOUD THEN'
+            - _bf_CaDo[].!Alarm_CaDoNietGesloten.StartOnderdrukken()
+            - END_IF
+            - _bf_Overdruk_grensruimtes[].SetAutobedieningsStand(AAN)
+            - _bf_Overdruk_grensruimtes[].SetOpAutobediening()
+            - _cf_CCTV_systeem.SetDoorgifteKanaalDerden(UIT)
+            - _bf_Blusvoorziening.SetHandVraag(BEWAKEN)
+            - _bf_VeVa[].VergrendelPlaatselijkeBediening()
+          js: |
+            if (true) {
+              ResetOnderdrukkingen();
+              IF #state = ONDERHOUD THEN;
+              TweeBuisStateControle.CaDo[].!Alarm_CaDoNietGesloten.StartOnderdrukken();
+              END_IF;
+              TweeBuisStateControle.Overdruk_grensruimtes[].SetAutobedieningsStand(AAN);
+              TweeBuisStateControle.Overdruk_grensruimtes[].SetOpAutobediening();
+              _cf_CCTV_systeem.SetDoorgifteKanaalDerden(UIT);
+              TweeBuisStateControle.Blusvoorziening.SetHandVraag(BEWAKEN);
+              TweeBuisStateControle.VeVa[].VergrendelPlaatselijkeBediening();
+            }
+          label: Tunnel_TweeBuisStateControle
+        bewaakCalamiteit:
+          stereotype: autonoom_proces
+          title: Bewaak calamiteit
+          description: Als een verkeersbuis een calamiteit detecteert moet na een
+            _calamiteit_detectie_tijd die verkeersbuis in calamiteit_volledig gezet
+            worden en de gerelateerde verkeersbuizen in calamiteit_ondersteunend,
+            tenzij een van de buizen al in calamiteit_volledig of calamiteit_ondersteund
+            zit. Een verkeersbuis die in calamiteit_ondersteunend zit kan niet in
+            calamiteit_volledig gezet worden.Als dit nodig is moet de bediening handmatig
+            de desbetreffende systemen aansturen.
+          ref: BSTTI#10807
+          comment: "Conditie: _cf_Verkeersbuis[].#substate <> calamiteit_volledig
+            && _cf_Verkeersbuis[].#substate<> calamiteit_evacuatie && _cf_Verkeersbuis[i].#calamiteit_detectie_tijd
+            \u2265 _calamiteit_tijd ; Acties: ; \uF022j(j <> i && _cf_Verkeersbuis[j].#substate<>
+            calamiteit_ondersteunend: ;_cf_Verkeersbuis[j].CalamiteitOndersteunend(_cf_Verkeersbuis[i].#rijrichting))
+            ; _cf_Verkeersbuis[i].CalamiteitVolledig()"
+          js: "if (_cf_Verkeersbuis[].#substate <> CALAMITEIT_VOLLEDIG && _cf_Verkeersbuis[].#substate<>
+            CALAMITEIT_EVACUATIE && _cf_Verkeersbuis[i].#calamiteit_detectie_tijd
+            >= _CALAMITEIT_TIJD) {\n  \uF022j(J <> I && _cf_Verkeersbuis[j].#substate<>
+            calamiteit_ondersteunend:;\n  _cf_Verkeersbuis[j].CalamiteitOndersteunend(_cf_Verkeersbuis[i].#rijrichting));\n
+            \ _cf_Verkeersbuis[i].CalamiteitVolledig();\n}\n"
+          bstti_name: BewaakCalamiteit
+          rules:
+          - conditie: _cf_Verkeersbuis[].#substate <> CALAMITEIT_VOLLEDIG && _cf_Verkeersbuis[].#substate<>
+              CALAMITEIT_EVACUATIE && _cf_Verkeersbuis[i].#calamiteit_detectie_tijd
+              >= _CALAMITEIT_TIJD
+            actie:
+            - ""
+            - "\uF022j(J <> I && _cf_Verkeersbuis[j].#substate<> calamiteit_ondersteunend:"
+            - _cf_Verkeersbuis[j].CalamiteitOndersteunend(_cf_Verkeersbuis[i].#rijrichting))
+            - _cf_Verkeersbuis[i].CalamiteitVolledig()
+          label: Tunnel_TweeBuisStateControle
+        handhaafBluswatervoorzieningStand:
+          stereotype: autonoom_proces
+          title: Handhaaf bluswatervoorziening stand
+          description: De blusvoorziening moet op blusdruk worden gebracht als een
+            verkeersbuis daarom vraagt en als een bediening van de basisfunctie bluswatervoorziening
+            (onafhankelijk van dit autonome proces) daarom vraagt. De basisfunctie
+            zorgt dat bewaken wordt gezet zodra deze situaties niet meer optreden.
+          ref: BSTTI#10807
+          comment: 'Conditie: _cf_Verkeersbuis[i].#blusvraag = ja ; Acties: _bf_Blusvoorziening.SetAutoVraag(blussen)
+            ; Conditie: _cf_Verkeersbuis[].#blusvraag = nee ; Acties: _bf_Blusvoorziening.SetAutoVraag(bewaken)'
+          js: |
+            if (_cf_Verkeersbuis[i].#blusvraag = JA) {
+              TweeBuisStateControle.Blusvoorziening.SetAutoVraag(BLUSSEN);
+            }
+            if (_cf_Verkeersbuis[].#blusvraag = NEE) {
+              TweeBuisStateControle.Blusvoorziening.SetAutoVraag(BEWAKEN);
+            }
+          bstti_name: HandhaafBluswatervoorzieningStand
+          rules:
+          - conditie: _cf_Verkeersbuis[i].#blusvraag = JA
+            actie:
+            - _bf_Blusvoorziening.SetAutoVraag(BLUSSEN)
+          - conditie: _cf_Verkeersbuis[].#blusvraag = NEE
+            actie:
+            - _bf_Blusvoorziening.SetAutoVraag(BEWAKEN)
+          label: Tunnel_TweeBuisStateControle
+    Tunnel_:
+      security:
+        read:
+        - aim_auth:
+          - website.read
+          - admin.read
+        write:
+        - aim_auth:
+          - website.readwrite
+          - admin.readwrite
+      treeTitleAttributeName: Product
+      header:
+      - - Product
+        - Model
+      - - Master
+      - - stand
+      properties:
+        BfLkmvb:
+          stereotype: configuratie_element
+          summary: _bf_lkmvb
+          description: De basisfunctie Luchtkwaliteitsmeting Verkeersbuis
+          bsttiName: _bf_lkmvb
+          bsttiNr: BSTTI#10146
+          bsttiPath:
+          - Functies van een Verkeersbuis
+          - Verkeersbuisventilatie-functies
+          - Zichthandhaving Verkeersbuis
+          - Configuratie-elementen
+          bstti_name: Bf_lkmvb
+        BfLvvb:
+          stereotype: configuratie_element
+          summary: _bf_lvvb
+          description: De basisfunctie Verkeersbuis Langsventilatie
+          bsttiName: _bf_lvvb
+          bsttiNr: BSTTI#10232
+          bsttiPath:
+          - Functies van een Verkeersbuis
+          - Verkeersbuisventilatie-functies
+          - Zichthandhaving Verkeersbuis
+          - Configuratie-elementen
+          bstti_name: Bf_lvvb
+        ZichtGrenswaardeAan = Lkmvb.GrenswaardeVerminderd:
+          stereotype: configuratie_element
+          summary: _zicht_grenswaarde_aan = _bf_lkmvb._grenswaarde_verminderd
+          description: De grenswaarde waarbij de ventilatie ingeschakeld moet worden.
+            Dit configuratie-element moet instelbaar zijn via een onderhoudskoppelvlak.
+          bsttiName: _zicht_grenswaarde_aan = _bf_lkmvb._grenswaarde_verminderd
+          bsttiNr: BSTTI#10233
+          bsttiPath:
+          - Functies van een Verkeersbuis
+          - Verkeersbuisventilatie-functies
+          - Zichthandhaving Verkeersbuis
+          - Configuratie-elementen
+          bstti_name: Zicht_grenswaarde_aan = _bf_lkmvb._grenswaarde_verminderd
+        ZichtGrenswaardeUit = 0,004:
+          stereotype: configuratie_element
+          summary: _zicht_grenswaarde_uit = 0,004
+          description: De grenswaarde waarbij de ventilatie niet meer ingeschakeld
+            hoeft te zijn. Dit configuratie-element moet instelbaar zijn via een onderhoudskoppelvlak.
+          bsttiName: _zicht_grenswaarde_uit = 0,004
+          bsttiNr: BSTTI#10234
+          bsttiPath:
+          - Functies van een Verkeersbuis
+          - Verkeersbuisventilatie-functies
+          - Zichthandhaving Verkeersbuis
+          - Configuratie-elementen
+          bstti_name: Zicht_grenswaarde_uit = 0,004
+        VentilatieRegelingAlgoritme:
+          stereotype: configuratie_element
+          summary: _ventilatie_regeling_algoritme
+          description: Het algoritme waarmee de ventilatie geregeld wordt zodat de
+            zichtwaarden binnen de normen blijven. Dit configuratie-element moet instelbaar
+            zijn via een onderhoudskoppelvlak.
+          bsttiName: _ventilatie_regeling_algoritme
+          bsttiNr: BSTTI#10235
+          bsttiPath:
+          - Functies van een Verkeersbuis
+          - Verkeersbuisventilatie-functies
+          - Zichthandhaving Verkeersbuis
+          - Configuratie-elementen
+          bstti_name: Ventilatie_regeling_algoritme
+      operations:
+        bewaakZicht:
+          stereotype: autonoom_proces
+          summary: '*BewaakZicht'
+          description: 'Regel het zicht in de verkeersbuis door te ventileren in het
+            geval van slecht zicht.   Het precieze algoritme is verkeersbuis-specifiek:
+            _ventilatie_regeling_algoritme   In elk geval moet ondersteund worden
+            dat gestart wordt met ventileren als de waarden boven _zicht_grenswaarde_aan
+            komen:'
+          bsttiName: '*BewaakZicht'
+          bsttiNr: BSTTI#8716
+          bsttiPath:
+          - Functies van een Verkeersbuis
+          - Verkeersbuisventilatie-functies
+          - Zichthandhaving Verkeersbuis
+          - Autonome processen
+          parameters:
+          - name: id
+            in: query
+            description: Identifier of Zichthandhaving_Verkeersbuis
+            required: true
+            schema:
+              type: number
+          operationId: Zichthandhaving_Verkeersbuis(id).*BewaakZicht
+          rules:
+          - Conditie: _bf_lkmvb.#beschikbaarheid <> niet_beschikbaar &&  _bf_lkmvb.#zichtmeting_max
+              > _zicht_grenswaarde_aan
+            Acties: '_bf_lvvb.SetSensorregelingStand(8)   En er mag pas gestopt worden
+              met ventileren als de waarden onder de_zicht_grenswaarde_uit zitten:'
+          - Conditie: _bf_lkmvb.#beschikbaarheid <> niet_beschikbaar &&  _bf_lkmvb.#zichtmeting_max
+              < _zicht_grenswaarde_uit
+            Acties: _bf_lvvb.SetSensorregelingStand(0)
+          js(): |
+            if (this.bf_lkmvb.beschikbaarheid != niet_beschikbaar &&;
+            this.bf_lkmvb.zichtmeting_max > this.zicht_grenswaarde_aan)
+            {
+            this.bf_lvvb.SetSensorregelingStand(8);
+             En er mag pas gestopt worden met ventileren als de waarden onder de_zicht_grenswaarde_uit zitten:;
+            }
+            if (this.bf_lkmvb.beschikbaarheid != niet_beschikbaar &&;
+            this.bf_lkmvb.zichtmeting_max < this.zicht_grenswaarde_uit)
+            {
+            this.bf_lvvb.SetSensorregelingStand(0);
+            }
+          st(): |-
+            IF Zichthandhaving_Verkeersbuis%d_bewaakZicht = 1 THEN
+            IF Zichthandhaving_Verkeersbuis%d_bf_lkmvb_beschikbaarheid <> niet_beschikbaar  AND   Zichthandhaving_Verkeersbuis%d_bf_lkmvb_zichtmeting_max > Zichthandhaving_Verkeersbuis%d_zicht_grenswaarde_aan THEN Zichthandhaving_Verkeersbuis%d_bf_lvvb.SetSensorregelingStand(8);
+            En er mag pas gestopt worden met ventileren als de waarden onder de_zicht_grenswaarde_uit zitten:;
+            ELSE IF Zichthandhaving_Verkeersbuis%d_bf_lkmvb_beschikbaarheid <> niet_beschikbaar  AND   Zichthandhaving_Verkeersbuis%d_bf_lkmvb_zichtmeting_max < Zichthandhaving_Verkeersbuis%d_zicht_grenswaarde_uit THEN Zichthandhaving_Verkeersbuis%d_bf_lvvb.SetSensorregelingStand(0);
+            END_IF;
+            END_IF;
+          bstti_name: bewaakZicht
+      gui:
+        global:
+          stand: ""
+          children:
+          - - DIV
+            - rood
+          - - DIV
+            - geel
+          - - DIV
+            - groen
+        detail:
+          stand: ""
+          children:
+          - - DIV
+            - rood
+          - - DIV
+            - geel
+          - - DIV
+            - groen
+      bstti_name: ""
+...

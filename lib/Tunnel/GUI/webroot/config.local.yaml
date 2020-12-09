@@ -1,0 +1,29 @@
+# RWS TMS EHT
+info:
+  title1: EHT1
+  description: RWS Eerste Heinenoordtunnel A29
+  version: 1.0.0
+config:
+  aim:
+    # client_id: 6E6F5CB3-245B-4433-9E76-B9CC8E956899
+    # aud: 2804394
+    # aud: 2804394
+    # sub: 2804394
+    # url: https://rws.aliconnect.nl/tms/eht/webroot/api
+    # protocol: https
+    # hostname: rws.aliconnect.nl
+    # basePath: /eht/tms/webroot/api
+    # domain: rws
+    # scope:
+    #   - name
+    #   - email
+    #   - mobile
+    headers:
+      Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJzaGEyNTYifQ.eyJpc3MiOiJyd3MuYWxpY29ubmVjdC5ubCIsInNjb3BlIjoid2Vic2l0ZS5yZWFkIG5hbWUgZW1haWwiLCJzdWIiOiIyODA0MzQyIiwiYXVkIjoiMzY2NjEzNCIsImV4cCI6MTYwNTM2Mjk3MCwiaWF0IjoxNjA1Mjc2NTcwfQ.UKHp3WPoh5DtXvZBG9D3TNpLeh6v17rD1kfJSRBWqxU
+    auth:
+      authorizationUrl: https://login.aliconnect.nl/api/oauth2
+      tokenUrl: https://login.aliconnect.nl/api/oauth2/token
+    websocket:
+      - url: wss://aliconnect.nl:444
+    servers:
+      - url: https://rws.aliconnect.nl/tms/eht/webroot/api

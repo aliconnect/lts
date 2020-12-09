@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>TMS Videowall</title>
+	<meta charset="utf-8">
+	<link rel="icon" type="image/png" href="/api/tms/favicon.ico" />
+
+	<script src="/v1/lib/three/three.js"></script>
+	<script src="/v1/lib/three/GLTFLoader.js"></script>
+	<!-- <script src="/lib/js/three/DRACOLoader.js"></script> -->
+	<script src="/v1/lib/three/OrbitControls.js"></script>
+
+	<!-- <script type="text/javascript" charset="UTF-8" src="https://aliconnect.nl/api/js"></script> -->
+	<script src="/v1/src/js/aim.js"></script>
+	<script src="/v1/src/js/web.js"></script>
+	<script src="/v1/src/js/auth.js"></script>
+	<script src="/v1/src/js/cam.js"></script>
+	<!-- <script src="../js/cfg/config.project.js" async defer></script> -->
+	<!-- <script src="../js/cfg/config.tms.js" async defer></script>
+	<script src="../js/cfg/config.gui.js" async defer></script>
+	<script src="../js/cfg/config.lfv.js" async defer></script>
+	<script src="../js/cfg/config.softwarefunction.js" async defer></script>
+	<script src="../js/cfg/config.videowall.js" async defer></script>
+	<script src="../js/cfg/config.system.js" async defer></script> -->
+	<script src="../js/tunnel.config.js" async defer></script>
+	<script src="js/videowall.config.js" async defer></script>
+	<script src="js/videowall.js" async defer></script>
+	<!-- <script src="https://aliconnect.nl/shared/48569/shapes.js"></script> -->
+	<style>
+		body {
+			font-family: Monospace;
+			background-color: #000;
+			margin: 0px;
+			padding: 0px;
+		}
+
+		.cameracontainer {
+			width: 100%;
+			display: flex;
+		}
+
+		.camerabox {
+			width: 640px;
+			height: 524px;
+		}
+		.statusbar {
+			position:fixed;
+			margin:auto;
+			bottom:0;
+			left:0;
+		}
+	</style>
+</head>
+<body>
+	<div id="btnbar" class="row top"><button>START</button><button onclick="go()">GO</button></div>
+	<div class="cameracontainer"></div>
+</body>
+</html>

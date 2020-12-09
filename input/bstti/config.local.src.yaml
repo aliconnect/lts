@@ -1,0 +1,62 @@
+---
+components:
+  schemas:
+    LFVHoogtedetectorVerkeersbuis:
+      bsttiName: LFV Hoogtedetector Verkeersbuis
+      bsttiParent: LFV's van een Verkeersbuis
+      parent: Verkeersbuis
+      properties:
+        hoogteOverschrijding:
+          bsttiName: '#hoogte_overschrijding'
+          bsttiEisNr: BSTTI#1646
+          bsttiEisTekst: 'BSTTI#1646 Elke hoogtedetector dient de volgende toestandsvariabelen
+            te hebben: #hoogte_overschrijding: ja | nee | detector_disabled De hoogte_overschrijding
+            geeft aan of er een hoogte overschrijding gedetecteerd is.  ja er is een
+            hoogte overschrijding gedetecteerd. nee er is geen hoogte overschrijding
+            gedetecteerd. detector_disabled de hoogtedetector functie is uitgeschakeld.    Als
+            er borden met aanstuurbare knipperlichten aanwezig zijn, dienen deze aan
+            te zijn dan en slechts dan als #hoogte_overschrijding = ja.'
+      operations:
+        setHoogteOverschrijding:
+          bsttiName: SetHoogteOverschrijding
+          bsttiEisNr: BSTTI#1642
+          bsttiEisTekst: ': SetHoogteOverschrijding(ja | nee | detector_disabled)
+            Commando om de hoogte_overschrijding een gewenste waarde te geven.  Bij
+            normaal gebruik van de hoogtedetector zal de hoogte_overschrijding op
+            ''nee'' staan, en bij een gedetecteerde overschrijding op ''ja'' springen.
+            Met dit commando kan #hoogte_overschrijding weer op ''nee'' gereset worden.  De
+            mogelijkheid om met dit commando de hoogte_overschrijding op ''ja'' te
+            kunnen zetten, en zo dus een gefingeerde hoogte overschrijding te bewerkstelligen,
+            is nuttig vanwege testbaarheid. Met dit commando kan de hoogtedetector
+            ook uitgeschakeld worden, door ''detector_disabled'' als argument te gebruiken.'
+    LFVHulppostVerkeersbuis:
+      properties:
+        stand:
+          js:
+            naam: jkhsdfkjhaslkjd
+      operations:
+        enableDetector:
+          bsttiName: EnableDetector
+          bsttiEisNr: BSTTI#10611
+          bsttiEisTekst: ': EnableDetector(sensor_id: deur | blusapparaat | spuitmond,
+            enabled: ja | nee): Activeert of deactiveert een toestandsvariabele; de
+            toestandsvariabele overeenkomend met sensor_id zal de actuele waarde reflecteren
+            (indien enabled = ''ja'') of krijgt de waarde ''detector_disabled'' (indien
+            enabled = ''nee''). Hierbij identificeert  sensor_id een van de toestandsvariabelen
+            (''deur'' voor #deur_open, ''blusapparaat'' voor #blusapparaat_in_houder,
+            en ''spuitmond'' voor #spuitmond_slanghaspel_in_houder).'
+    LFVVerlichtingVerkeersbuis:
+      bsttiName: LFV Verlichting Verkeersbuis
+      bsttiParent: LFV's van een Verkeersbuis
+      parent: Verkeersbuis
+      properties:
+        richting:
+          bsttiName: '#richting'
+          bsttiEisNr: BSTTI#2199
+          bsttiEisTekst: 'BSTTI#2199 Verlichting dient de volgende toestandsvariabelen
+            te hebben: #richting: aflopend | oplopend De beoogde rijrichting. De waarde
+            van deze toestandsvariabele bepaalt wat de ingangszijde van de verkeersbuis
+            is. Alleen bij optiepakket 3 zal de waarde van deze toestandsvariabele
+            variabel zijn. oplopend: in de richting van oplopende hectometeraanduiding;
+            aflopend: in de richting van aflopende hectometeraanduiding.'
+...

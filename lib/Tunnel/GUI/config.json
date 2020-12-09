@@ -1,0 +1,8 @@
+{
+  "debug": true,
+  "config": {
+    "oauth2": {
+      "url": "https://login.aliconnect.nl/api/oauth2"
+    }
+  }
+}

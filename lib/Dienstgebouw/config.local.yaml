@@ -1,0 +1,54 @@
+---
+components:
+  schemas:
+    Dienstgebouw_CCTV:
+      naam: Basisfunctie CCTV Dienstgebouw
+      hoortbij: Dienstgebouw
+      titel: CCTV
+      type: basis_functie
+    Dienstgebouw_Kanaal:
+      naam: Subfunctie Kanaal
+      hoortbij: Dienstgebouw
+      titel: Kanaal
+      type: sub_functie
+    Dienstgebouw_Camera:
+      naam: Subfunctie Camera
+      hoortbij: Dienstgebouw
+      titel: Camera
+      type: sub_functie
+    Dienstgebouw_Toegang:
+      naam: Basisfunctie Toegang Dienstgebouw
+      hoortbij: Dienstgebouw
+      titel: Toegang
+      type: basis_functie
+    Dienstgebouw_Deur:
+      naam: Subfunctie Deur Dienstgebouw
+      hoortbij: Dienstgebouw
+      titel: Deur
+      type: sub_functie
+    Dienstgebouw_Blusvoorziening:
+      naam: Basisfunctie Blusvoorziening Dienstgebouw
+      hoortbij: Dienstgebouw
+      titel: Blusvoorziening
+      type: basis_functie
+    Dienstgebouw_Klimaatregeling:
+      naam: Basisfunctie Klimaatregeling Dienstgebouw
+      hoortbij: Dienstgebouw
+      titel: Klimaatregeling
+      type: basis_functie
+    Dienstgebouw_Inbraakalarm:
+      naam: Basisfunctie Inbraakalarm Dienstgebouw
+      hoortbij: Dienstgebouw
+      titel: Inbraakalarm
+      type: basis_functie
+    Dienstgebouw_Verlichting:
+      naam: Basisfunctie Verlichting Dienstgebouw
+      hoortbij: Dienstgebouw
+      titel: Verlichting
+      type: basis_functie
+    Dienstgebouw_Gebouwbeheersysteem:
+      naam: "Co\xF6rdinerende functie Gebouwbeheersysteem"
+      hoortbij: Dienstgebouw
+      titel: Gebouwbeheersysteem
+      type: coordinatie_functie
+...

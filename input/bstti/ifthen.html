@@ -1,0 +1,23 @@
+<script>
+function stop(){
+  console.log('stop');
+}
+rule = {
+  if: '1===1',
+  then: [
+    'stopq()',
+  ]
+}
+// rule = `if(${rule.if}){${rule.then.join(';')}}`;
+let start = new Function(`if(${rule.if}){${rule.then.join(';')}}`);
+try {
+  start();
+  // eval(rule);
+} catch (err) {
+  console.log(err);
+}
+start();
+
+
+
+</script>

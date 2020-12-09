@@ -1,0 +1,27 @@
+---
+components:
+  schemas:
+    Applicatiebediening(GUI):
+      properties:
+        ? Ter identificatie en lokalisatie van de verschillende GUIs over UKVC dient
+          met volgende lijst de mapping van taakcontext naar URL voor-geconfigureerd
+          te worden
+        : stereotype: configuratie_element
+          summary: Ter identificatie en lokalisatie van de verschillende GUIs over
+            UKVC dient met volgende lijst de mapping van taakcontext naar URL voor-geconfigureerd
+            te worden
+          description: '_gui_urls[ to_actief | to_inzien | tech_beheer | oper_beheer
+            ]   Hierbij komen de gebruikte namen voor de indices als volgt overeen
+            met taakcontexten:          to_actief:   Tunneloperator bedienen;          to_inzien:   Tunneloperator
+            inzien;          tech_beheer:  Technisch beheerder TTI;          oper_beheer:  Operationeel
+            beheerder TTI.'
+          bsttiName: Ter identificatie en lokalisatie van de verschillende GUIs over
+            UKVC dient met volgende lijst de mapping van taakcontext naar URL voor-geconfigureerd
+            te worden
+          bsttiNr: BSTTI#18704
+          bsttiPath:
+          - UKVC Koppeling
+          - Deelkoppelvlakken
+          - UKVC1 - Applicatiebediening (GUI)
+          - Configuratie-elementen
+...

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html class="app" dark="1">
+<head>
+	<title>VMS Demo</title>
+	<meta name="viewport" content="minimum-scale=1.0, width=device-width, maximum-scale=0.6667, user-scalable=no" />
+	<script src="/src/js/aim.js"></script>
+	<script src="/src/js/web.js"></script>
+	<script>
+	let openwindows = [];
+	subwindows_close = function () {
+		openwindows.forEach( w => w.close());
+	}
+	</script>
+</head>
+<body class='col'>
+	<button onclick="subwindows_close()">CLOSE</button>
+	<script>
+	const options = 'resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,directories=no,status=yes';
+	const urls = [
+		[
+			'http://localhost:9002',
+			'GUI Local',
+			'width=1700,height=1080,top=0,left=0,' + options
+		],
+		[
+			'https://rws.aliconnect.nl/tms/eht/lts/lib/Tunnel/GUI/webroot/?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJzaGEyNTYifQ.eyJpc3MiOiJyd3MuYWxpY29ubmVjdC5ubCIsInNjb3BlIjoid2Vic2l0ZS5yZWFkIG5hbWUgZW1haWwiLCJzdWIiOiIyODA0MzQyIiwiYXVkIjoiMzY2NjEzNCIsImV4cCI6MTYwNTM2Mjk3MCwiaWF0IjoxNjA1Mjc2NTcwfQ.UKHp3WPoh5DtXvZBG9D3TNpLeh6v17rD1kfJSRBWqxU',
+			'GUI Cloud',
+			'width=1700,height=1080,top=0,left=0,' + options
+		],
+		[
+			'https://rws.aliconnect.nl/tms/eht/webroot/om/Verkeerslichten(3443787)/children/id/aHR0cHM6Ly9yd3MuYWxpY29ubmVjdC5ubC9hcGkvVmVya2VlcnNsaWNodGVuKDM0NDM3ODcp/?$select=Title,Subject,Summary,Master,Source,HasChildren,HasAttachements,State,Categories,CreatedDateTime,LastModifiedDateTime,LastVisitDateTime,StartDateTime,EndDateTime,FinishDateTime&$filter=FinishDateTime IS NULL',
+			'OM Verkeerslichten',
+			'width=1400,height=600,top=0,left=0,' + options
+		],
+		[
+			'http://localhost:9004',
+			'HMI Local',
+			'width=600,height=400,top=0,left=0,' + options
+		],
+		[
+			'http://192.168.0.135:8080/',
+			'HMI PI',
+			'width=600,height=400,top=0,left=0,' + options
+		],
+		[
+			'https://wall.aliconnect.nl/v1/api/lib/vms/index.html?wall=1',
+			'Video Wall',
+			'width=1700,height=800,top=0,left=0,' + options
+		],
+		[
+			'https://rws.aliconnect.nl/tms/eht/lts/lib/Tunnel/GUI/webroot/twin/?wall=1&access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJzaGEyNTYifQ.eyJpc3MiOiJyd3MuYWxpY29ubmVjdC5ubCIsInNjb3BlIjoid2Vic2l0ZS5yZWFkIG5hbWUgZW1haWwiLCJzdWIiOiIyODA0MzQyIiwiYXVkIjoiMzY2NjEzNCIsImV4cCI6MTYwNTM2Mjk3MCwiaWF0IjoxNjA1Mjc2NTcwfQ.UKHp3WPoh5DtXvZBG9D3TNpLeh6v17rD1kfJSRBWqxU',
+			'Camera Twin',
+			'width=1200,height=600,top=0,left=0,' + options
+		],
+		[
+			'https://wall.aliconnect.nl/v1/api/lib/vms/index.html?wall=1&cam=301',
+			'Camera',
+			'width=500,height=300,top=0,left=0,' + options
+		],
+		[
+			'https://wall.aliconnect.nl/v1/api/lib/vms/index.html?wall=1&facingMode=user&cam=302',
+			'Camera User',
+			'width=500,height=300,top=0,left=0,' + options
+		],
+	];
+	urls.forEach(url => {
+		document.body.createElement('BUTTON', '', url[1], {onclick: event => {
+			openwindows.push(window.open(...url));
+		}})
+	})
+
+
+
+	</script>
+</body>
+</html>

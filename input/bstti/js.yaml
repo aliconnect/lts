@@ -1,0 +1,1113 @@
+---
+Hoogtedetector_#hoogte_overschrijding:
+  name: Hoogtedetector_#hoogte_overschrijding
+  description: |
+    Geeft aan dat een hoogte overschrijding gedetecteerd is en dat (indien aanwezig) de lichten van het bijbehorende dynamisch bord aanstaan.
+  enum:
+  - detector_disabled
+  - ja
+  - nee
+  waarde:
+  - als: _lfv_hd.#observeerbaar = ja
+    dan: _lfv_hd.#hoogte_overschrijding
+  code: |2-
+
+    function Hoogtedetector_Hoogtedetector_#hoogte_overschrijding(id) {
+      const Hoogtedetector = AIM(id);
+      if (
+        Hoogtedetector._lfv_hd.#observeerbaar === JA
+      ) {
+        return Hoogtedetector._lfv_hd.#hoogte_overschrijding;
+      }
+    }
+Hoogtedetector_#beschikbaarheid:
+  name: Hoogtedetector_#beschikbaarheid
+  description: |
+    Geeft de beschikbaarheid van de functie aan.
+  enum:
+  - niet_beschikbaar
+  - beperkt_beschikbaar
+  - beschikbaar
+  waarde:
+  - als: _lfv_hd.#bestuurbaar = nee || _lfv_hd.#storingen[i] = STORING_DETECTIE
+    dan: niet_beschikbaar
+  - als: _lfv_hd.#bestuurbaar = ja && _lfv_hd.#storingen = {}
+    dan: beschikbaar
+  - als: 1
+    dan: beperkt_beschikbaar
+  code: |2-
+
+    function Hoogtedetector_Hoogtedetector_#beschikbaarheid(id) {
+      const Hoogtedetector = AIM(id);
+      if (
+        Hoogtedetector._lfv_hd.#bestuurbaar === nee || Hoogtedetector._lfv_hd.#storingen[i] === Hoogtedetector.STORING_DETECTIE
+      ) {
+        return NIET_BESCHIKBAAR;
+      }
+      else if (
+        Hoogtedetector._lfv_hd.#bestuurbaar === ja &&
+        Hoogtedetector._lfv_hd.#storingen === {}
+      ) {
+        return BESCHIKBAAR;
+      }
+      else if (
+        1
+      ) {
+        return BEPERKT_BESCHIKBAAR;
+      }
+    }
+Hoogtedetector_#enabled:
+  name: Hoogtedetector_#enabled
+  description: |-
+    Geeft aan of deze Hoogtedetector enabled of disabled is.
+    Init:
+     init_patroon(#hoogte_overschrijding <> ongeldig, #hoogte_overschrijding <> detector_disabled)
+  enum:
+  - ja
+  - nee
+  code: |2-
+
+    function Hoogtedetector_Hoogtedetector_#enabled(id) {
+      const Hoogtedetector = AIM(id);
+      undefined
+    }
+Hoogtedetector_#in_gebruik:
+  name: Hoogtedetector_#in_gebruik
+  description: |-
+    PERSISTENT Geeft voor toepassing in wisselbuizen aan of deze instantie van basisfunctie hoogtedetector wel of niet in gebruik moet zijn.
+    Voor toepassing in verkeersbuizen die geen wisselbuizen zijn, dient de waarde van #in_gebruik altijd 'ja' te zijn.
+    N.B.:
+     de waarde van #in_gebruik representeert een streven.
+    Of de hoogtedetector daadwerkelijk in gebruik is wordt weergegeven door de variabele #daadwerkelijk_in_gebruik.
+  enum:
+  - ja
+  - nee
+  code: |2-
+
+    function Hoogtedetector_Hoogtedetector_#in_gebruik(id) {
+      const Hoogtedetector = AIM(id);
+      undefined
+    }
+Hoogtedetector_#daadwerkelijk_in_gebruik:
+  name: Hoogtedetector_#daadwerkelijk_in_gebruik
+  description: |
+    Geeft aan of deze instantie van basisfunctie hoogtedetector daadwerkelijk in gebruik is.
+  enum:
+  - ja
+  - nee
+  - onbekend
+  waarde:
+  - als: '#in_gebruik = ja && #enabled = ja && #hoogte_overschrijding = (nee | ja)'
+    dan: ja
+  - als: '#in_gebruik = ja && #enabled = nee && #hoogte_overschrijding = detector_disabled'
+    dan: ja
+  - als: '#in_gebruik = nee && #hoogte_overschrijding = detector_disabled'
+    dan: nee
+  - als: 1
+    dan: onbekend
+  code: |2-
+
+    function Hoogtedetector_Hoogtedetector_#daadwerkelijk_in_gebruik(id) {
+      const Hoogtedetector = AIM(id);
+      if (
+        Hoogtedetector.#in_gebruik === JA &&
+        Hoogtedetector.#enabled === JA &&
+        Hoogtedetector.#hoogte_overschrijding === (nee | JA)
+      ) {
+        return JA;
+      }
+      else if (
+        Hoogtedetector.#in_gebruik === JA &&
+        Hoogtedetector.#enabled === NEE &&
+        Hoogtedetector.#hoogte_overschrijding === DETECTOR_DISABLED
+      ) {
+        return JA;
+      }
+      else if (
+        Hoogtedetector.#in_gebruik === NEE &&
+        Hoogtedetector.#hoogte_overschrijding === DETECTOR_DISABLED
+      ) {
+        return NEE;
+      }
+      else if (
+        1
+      ) {
+        return ONBEKEND;
+      }
+    }
+name: Hoogtedetector_ResetHoogtedetector
+Hoogtedetectie_#beschikbaarheid:
+  name: Hoogtedetectie_#beschikbaarheid
+  description: |-
+    Geeft de beschikbaarheid van de functie Hoogtedetectie.
+    IF _bf_rhd.#beschikbaarheid = niet_beschikbaar THEN #beschikbaarheid :
+    = niet_beschikbaar ELSIF _bf_rhd.#beschikbaarheid = beschikbaar && _bf_whd.#beschikbaarheid = beschikbaar THEN #beschikbaarheid := beschikbaar ELSE #beschikbaarheid := beperkt_beschikbaar END_IF
+  enum:
+  - niet_beschikbaar
+  - beperkt_beschikbaar
+  - beschikbaar
+  code: |2-
+
+    function Hoogtedetectie_Hoogtedetectie_#beschikbaarheid(id) {
+      const Hoogtedetectie = AIM(id);
+      undefined
+    }
+Hoogtedetectie_#status:
+  name: Hoogtedetectie_#status
+  description: |-
+    De status van de functie Hoogtedetectie volgens onderstaande tabel.
+    _bf_whd.
+    #beschikbaarheid<> niet_beschikbaar _bf_whd.
+    #hoogte_overschrijding _bf_rhd.
+    #beschikbaarheid<> niet_beschikbaar _bf_rhd.
+    #hoogte_overschrijding #status nee * ja nee detectiefase ja nee ja nee detectiefase ja ja ja nee waarschuwingsfase * * ja ja roodfase  Tabel 10-1:
+     Waarheidstabel hoogtedetectie
+  enum:
+  - detectiefase
+  - roodfase
+  - waarschuwingsfase
+  code: |2-
+
+    function Hoogtedetectie_Hoogtedetectie_#status(id) {
+      const Hoogtedetectie = AIM(id);
+      undefined
+    }
+Hoogtedetectie_#enabled:
+  name: Hoogtedetectie_#enabled
+  description: |-
+    Geeft aan of deze functie enabled of disabled is.
+    Als de functie enabled (#enabled = ja) is worden de autonome processen en signaleringen van deze functie uitgevoerd.
+  enum:
+  - ja
+  - nee
+  code: |2-
+
+    function Hoogtedetectie_Hoogtedetectie_#enabled(id) {
+      const Hoogtedetectie = AIM(id);
+      undefined
+    }
+Hoogtedetectie_#in_gebruik:
+  name: Hoogtedetectie_#in_gebruik
+  description: |-
+    PERSISTENT Geeft voor toepassing in wisselbuizen aan of deze instantie van functie hoogtedetectie wel of niet in gebruik moet zijn.
+    Voor toepassing in verkeersbuizen die geen wisselbuizen zijn, dient de waarde van #in_gebruik altijd 'ja' te zijn.
+    N.B.:
+     de waarde van #in_gebruik representeert een streven.
+    Of de hoogtedetectie daadwerkelijk in gebruik is wordt weergegeven door de variabele #daadwerkelijk_in_gebruik.
+  enum:
+  - ja
+  - nee
+  code: |2-
+
+    function Hoogtedetectie_Hoogtedetectie_#in_gebruik(id) {
+      const Hoogtedetectie = AIM(id);
+      undefined
+    }
+Hoogtedetectie_#daadwerkelijk_in_gebruik:
+  name: Hoogtedetectie_#daadwerkelijk_in_gebruik
+  description: |
+    Geeft aan of deze instantie van functie hoogtedetectie daadwerkelijk in gebruik is.
+  enum:
+  - ja
+  - nee
+  - gedeeltelijk
+  waarde:
+  - als: '_bf_whd.#daadwerkelijk_in_gebruik = ja && _bf_rhd.#daadwerkelijk_in_gebruik
+      = ja && #in_gebruik = ja'
+    dan: ja
+  - als: '_bf_whd.#daadwerkelijk_in_gebruik = nee && _bf_rhd.#daadwerkelijk_in_gebruik
+      = nee && #in_gebruik = nee'
+    dan: nee
+  - als: 1
+    dan: gedeeltelijk
+  code: |2-
+
+    function Hoogtedetectie_Hoogtedetectie_#daadwerkelijk_in_gebruik(id) {
+      const Hoogtedetectie = AIM(id);
+      if (
+        Hoogtedetectie._bf_whd.#daadwerkelijk_in_gebruik === JA &&
+        Hoogtedetectie._bf_rhd.#daadwerkelijk_in_gebruik === JA &&
+        Hoogtedetectie.#in_gebruik === JA
+      ) {
+        return JA;
+      }
+      else if (
+        Hoogtedetectie._bf_whd.#daadwerkelijk_in_gebruik === NEE &&
+        Hoogtedetectie._bf_rhd.#daadwerkelijk_in_gebruik === NEE &&
+        Hoogtedetectie.#in_gebruik === NEE
+      ) {
+        return NEE;
+      }
+      else if (
+        1
+      ) {
+        return GEDEELTELIJK;
+      }
+    }
+Hoogtedetector_SetEnabled:
+  name: Hoogtedetector_SetEnabled
+  description: Enable de functie hoogtedetector. Het autonome gedrag van de LFV wordt
+    nu weer geactiveerd.
+  actie:
+  - '#enabled := ja'
+  code: |-
+    function Hoogtedetector_Hoogtedetector_SetEnabled(id) {
+      const Hoogtedetector = AIM(id);
+      return #enabled := ja
+    }
+Hoogtedetector_ResetHoogtedetector:
+  name: Hoogtedetector_ResetHoogtedetector
+  description: Reset de status van de hoogtedetector.
+  actie:
+  - als: _lfv_hd.#bestuurbaar = ja
+    dan:
+    - _lfv_hd.SetHoogteOverschrijding(nee)
+  code: |-
+    function Hoogtedetector_Hoogtedetector_ResetHoogtedetector(id) {
+      const Hoogtedetector = AIM(id);
+      if (
+    undefined
+    )
+    }
+Hoogtedetector_SetInGebruik:
+  name: Hoogtedetector_SetInGebruik
+  description: Besturing die voor toepassing in wisselbuizen gebruikt wordt om deze
+    instantie van hoogtedetector in of uit te schakelen. Wanneer aangeroepen met het
+    argument 'ja', dan moet de hoogtedetector functioneren als bij een verkeersbuis
+    die geen wisselbuis is. Wanneer aangeroepen met de argument 'nee', dan moet deze
+    hoogtedetector geen hoogtedetecties meer doorgeven, maar moeten overige detecties
+    en signaleringen normaal blijven functioneren.
+  params: 'in_gebruik: ja | nee'
+  actie:
+  - '#in_gebruik := in_gebruik'
+  code: |-
+    function Hoogtedetector_Hoogtedetector_SetInGebruik(id) {
+      const Hoogtedetector = AIM(id);
+      return #in_gebruik := in_gebruik
+    }
+Hoogtedetector_*HandhaafInstellingen:
+  name: Hoogtedetector_*HandhaafInstellingen
+  description: 'Dit autonoom proces stelt de LFV in aan de hand van de variabelen
+    #enabled en #in_gebruik. Verder draagt dit autonoom proces er zorg voor dat na
+    de overgang van niet bestuurbaarheid naar bestuurbaarheid het juiste gedrag vertoond
+    wordt.'
+  actie:
+  - als: '_lfv_hd.#bestuurbaar = ja &&  (#enabled = nee || #in_gebruik = nee) &&  _lfv_hd.#hoogte_overschrijding
+      <> detector_disabled'
+    dan:
+    - _lfv_hd.SetHoogteOverschrijding(detector_disabled)
+  - als: |-
+      _lfv_hd.#bestuurbaar = ja &&  (#enabled = ja && #in_gebruik = ja )
+      &&  _lfv_hd.#hoogte_overschrijding = detector_disabled
+    dan:
+    - _lfv_hd.SetHoogteOverschrijding(nee)
+  code: |-
+    function Hoogtedetector_Hoogtedetector_*HandhaafInstellingen(id) {
+      const Hoogtedetector = AIM(id);
+      if (
+        Hoogtedetector._lfv_hd.#bestuurbaar === JA &&
+         (#enabled === NEE ||
+        Hoogtedetector.#in_gebruik === NEE) &&
+         Hoogtedetector._lfv_hd.#hoogte_overschrijding != DETECTOR_DISABLED
+      ) {
+    _lfv_hd.SetHoogteOverschrijding(detector_disabled);
+      } else if (
+        Hoogtedetector._lfv_hd.#bestuurbaar === JA &&
+         (#enabled === JA &&
+        Hoogtedetector.#in_gebruik === JA )
+    &&
+         Hoogtedetector._lfv_hd.#hoogte_overschrijding === DETECTOR_DISABLED
+      ) {
+    _lfv_hd.SetHoogteOverschrijding(nee);
+      }
+    }
+Hoogtedetectie_#hoogtedetectoren_disabled:
+  name: Hoogtedetectie_#hoogtedetectoren_disabled
+  description: |
+    Deze variabele heeft de waarde 'ja' als beide hoogtedetectoren disabled zijn, de waarde 'nee' als beide hoogtedetectoren enabled zijn, en de waarde 'gedeeltelijk' in alle andere gevallen.
+  enum:
+  - ja
+  - nee
+  - gedeeltelijk
+  waarde:
+  - als: _bf_whd.#enabled = nee && _bf_rhd.#enabled = nee
+    dan: ja
+  - als: _bf_whd.#enabled = ja && _bf_rhd.#enabled = ja
+    dan: nee
+  - als: 1
+    dan: gedeeltelijk
+  code: |2-
+
+    function Hoogtedetectie_Hoogtedetectie_#hoogtedetectoren_disabled(id) {
+      const Hoogtedetectie = AIM(id);
+      if (
+        Hoogtedetectie._bf_whd.#enabled === NEE &&
+        Hoogtedetectie._bf_rhd.#enabled === NEE
+      ) {
+        return JA;
+      }
+      else if (
+        Hoogtedetectie._bf_whd.#enabled === JA &&
+        Hoogtedetectie._bf_rhd.#enabled === JA
+      ) {
+        return NEE;
+      }
+      else if (
+        1
+      ) {
+        return GEDEELTELIJK;
+      }
+    }
+Hoogtedetectie_#aantal_actieve_deelsysteem_alarmen:
+  name: Hoogtedetectie_#aantal_actieve_deelsysteem_alarmen
+  description: "0..n Het aantal deelsysteem-alarmen van \xE9\xE9n of beide hoogtedetectoren
+    of van hoogtedetectie dat \"actief\" is (d.w.z.\nwaarvan de Conditie van dat deelsysteem-alarm
+    waar is).\nHet betreft hier zowel de generieke deelsysteem-alarmen (zoals !Alarm_NietBestuurbaarWegensStoring)
+    als de specifieke deelsysteem-alarmen (zoals !Alarm_NietBeschikbaar).\nHierbij
+    is 'n' het aantal (generieke en specifieke) deelsysteem-alarmen dat beide hoogtedetectoren
+    en hoogtedetectie in totaal hebben.\n\n"
+  waarde:
+  - als: 1
+    dan: "De som van de volgende aantallen: \uF0B7 Het aantal deelsysteem-alarmen
+      _bf_whd.!Alarm waarvoor geldt _bf_whd.!Alarm.#conditiewaarde = ja, waarbij !Alarm
+      de verzameling van (generieke en specifieke) deelsysteem-alarmen van hoogtedetector
+      doorloopt.\n\uF0B7 Het aantal deelsysteem-alarmen _bf_rhd.!Alarm waarvoor geldt
+      _bf_rhd.!Alarm.#conditiewaarde = ja, waarbij !Alarm de verzameling van (generieke
+      en specifieke) deelsysteem-alarmen van hoogtedetector doorloopt.\n\uF0B7 Het
+      aantal deelsysteem-alarmen !Alarm waarvoor geldt !Alarm.#conditiewaarde = ja,
+      waarbij !Alarm de verzameling van deelsysteem-alarmen van hoogtedetectie doorloopt."
+  code: "\nfunction Hoogtedetectie_Hoogtedetectie_#aantal_actieve_deelsysteem_alarmen(id)
+    {\n  const Hoogtedetectie = AIM(id);\n  if (\n    1\n  ) {\n    return Hoogtedetectie.De
+    Hoogtedetectie.som Hoogtedetectie.van Hoogtedetectie.de Hoogtedetectie.volgende
+    Hoogtedetectie.aantallen: \uF0B7 Hoogtedetectie.Het Hoogtedetectie.aantal Hoogtedetectie.deelsysteem-alarmen
+    Hoogtedetectie._bf_whd.!Alarm Hoogtedetectie.waarvoor Hoogtedetectie.geldt Hoogtedetectie._bf_whd.!Alarm.#conditiewaarde
+    = JA, Hoogtedetectie.waarbij !Alarm Hoogtedetectie.de Hoogtedetectie.verzameling
+    Hoogtedetectie.van (generieke Hoogtedetectie.en Hoogtedetectie.specifieke) Hoogtedetectie.deelsysteem-alarmen
+    Hoogtedetectie.van Hoogtedetectie.hoogtedetector Hoogtedetectie.doorloopt.\n\uF0B7
+    Hoogtedetectie.Het Hoogtedetectie.aantal Hoogtedetectie.deelsysteem-alarmen Hoogtedetectie._bf_rhd.!Alarm
+    Hoogtedetectie.waarvoor Hoogtedetectie.geldt Hoogtedetectie._bf_rhd.!Alarm.#conditiewaarde
+    = JA, Hoogtedetectie.waarbij !Alarm Hoogtedetectie.de Hoogtedetectie.verzameling
+    Hoogtedetectie.van (generieke Hoogtedetectie.en Hoogtedetectie.specifieke) Hoogtedetectie.deelsysteem-alarmen
+    Hoogtedetectie.van Hoogtedetectie.hoogtedetector Hoogtedetectie.doorloopt.\n\uF0B7
+    Hoogtedetectie.Het Hoogtedetectie.aantal Hoogtedetectie.deelsysteem-alarmen !Alarm
+    Hoogtedetectie.waarvoor Hoogtedetectie.geldt !Alarm.#conditiewaarde = JA, Hoogtedetectie.waarbij
+    !Alarm Hoogtedetectie.de Hoogtedetectie.verzameling Hoogtedetectie.van Hoogtedetectie.deelsysteem-alarmen
+    Hoogtedetectie.van Hoogtedetectie.hoogtedetectie Hoogtedetectie.doorloopt.;\n
+    \ }\n}"
+Hoogtedetectie_#aantal_actieve_verkeerskundige_alarmen:
+  name: Hoogtedetectie_#aantal_actieve_verkeerskundige_alarmen
+  description: "0..n Het aantal verkeerskundige alarmen van \xE9\xE9n of beide hoogtedetectoren
+    of van hoogtedetectie dat \"actief\" is (d.w.z.\nwaarvan de Conditie van dat verkeerskundige
+    alarm waar is).\nHet betreft hier zowel de generieke verkeerskundige alarmen (zoals
+    !Alarm_Noodstop) als de specifieke verkeerskundige alarmen (zoals !Alarm_TeHoogVoertuigGedetecteerdRoodFase).\nHierbij
+    is 'n' het aantal (generieke en specifieke) verkeerskundige alarmen dat beide
+    hoogtedetectoren en hoogtedetectie in totaal hebben.\n\n"
+  waarde:
+  - als: 1
+    dan: "De som van de volgende aantallen: \uF0B7 Het aantal verkeerskundige alarmen
+      _bf_whd.!Alarm waarvoor geldt _bf_whd.!Alarm.#conditiewaarde = ja, waarbij !Alarm
+      de verzameling van (generieke en specifieke) verkeerskundige alarmen van hoogtedetector
+      doorloopt.\n\uF0B7 Het aantal verkeerskundige alarmen _bf_rhd.!Alarm waarvoor
+      geldt _bf_rhd.!Alarm.#conditiewaarde = ja, waarbij !Alarm de verzameling van
+      (generieke en specifieke) alarmen van hoogtedetector doorloopt.\n\uF0B7 Het
+      aantal verkeerskundige alarmen !Alarm waarvoor geldt !Alarm.#conditiewaarde
+      = ja, waarbij !Alarm de verzameling van verkeerskundige alarmen van hoogtedetectie
+      doorloopt."
+  code: "\nfunction Hoogtedetectie_Hoogtedetectie_#aantal_actieve_verkeerskundige_alarmen(id)
+    {\n  const Hoogtedetectie = AIM(id);\n  if (\n    1\n  ) {\n    return Hoogtedetectie.De
+    Hoogtedetectie.som Hoogtedetectie.van Hoogtedetectie.de Hoogtedetectie.volgende
+    Hoogtedetectie.aantallen: \uF0B7 Hoogtedetectie.Het Hoogtedetectie.aantal Hoogtedetectie.verkeerskundige
+    Hoogtedetectie.alarmen Hoogtedetectie._bf_whd.!Alarm Hoogtedetectie.waarvoor Hoogtedetectie.geldt
+    Hoogtedetectie._bf_whd.!Alarm.#conditiewaarde = JA, Hoogtedetectie.waarbij !Alarm
+    Hoogtedetectie.de Hoogtedetectie.verzameling Hoogtedetectie.van (generieke Hoogtedetectie.en
+    Hoogtedetectie.specifieke) Hoogtedetectie.verkeerskundige Hoogtedetectie.alarmen
+    Hoogtedetectie.van Hoogtedetectie.hoogtedetector Hoogtedetectie.doorloopt.\n\uF0B7
+    Hoogtedetectie.Het Hoogtedetectie.aantal Hoogtedetectie.verkeerskundige Hoogtedetectie.alarmen
+    Hoogtedetectie._bf_rhd.!Alarm Hoogtedetectie.waarvoor Hoogtedetectie.geldt Hoogtedetectie._bf_rhd.!Alarm.#conditiewaarde
+    = JA, Hoogtedetectie.waarbij !Alarm Hoogtedetectie.de Hoogtedetectie.verzameling
+    Hoogtedetectie.van (generieke Hoogtedetectie.en Hoogtedetectie.specifieke) Hoogtedetectie.alarmen
+    Hoogtedetectie.van Hoogtedetectie.hoogtedetector Hoogtedetectie.doorloopt.\n\uF0B7
+    Hoogtedetectie.Het Hoogtedetectie.aantal Hoogtedetectie.verkeerskundige Hoogtedetectie.alarmen
+    !Alarm Hoogtedetectie.waarvoor Hoogtedetectie.geldt !Alarm.#conditiewaarde = JA,
+    Hoogtedetectie.waarbij !Alarm Hoogtedetectie.de Hoogtedetectie.verzameling Hoogtedetectie.van
+    Hoogtedetectie.verkeerskundige Hoogtedetectie.alarmen Hoogtedetectie.van Hoogtedetectie.hoogtedetectie
+    Hoogtedetectie.doorloopt.;\n  }\n}"
+Hoogtedetectie_#aantal_actieve_storingen:
+  name: Hoogtedetectie_#aantal_actieve_storingen
+  description: "0..n Het aantal storingen van \xE9\xE9n of beide hoogtedetectoren
+    of van hoogtedetectie dat \"actief\" is (d.w.z.\nwaarvan de Conditie van die storing
+    waar is).\nHet betreft hier zowel de generieke storingen (zoals !Storing_Algemeen)
+    als de specifieke storingen (zoals !Storing_BijzonderBord).\nHierbij is 'n' het
+    aantal (generieke en specifieke) storingen dat beide hoogtedetectoren en hoogtedetectie
+    in totaal hebben.\n\n"
+  waarde:
+  - als: 1
+    dan: "De som van de volgende aantallen: \uF0B7 Het aantal storingen _bf_whd.!Storing
+      waarvoor geldt _bf_whd.!Storing.#conditiewaarde = ja, waarbij !Storing de verzameling
+      van (generieke en specifieke) storingen van hoogtedetector doorloopt.\n\uF0B7
+      Het aantal storingen _bf_rhd.!Storing waarvoor geldt _bf_rhd.!Storing.#conditiewaarde
+      = ja, waarbij !Storing de verzameling van (generieke en specifieke) storingen
+      van hoogtedetector doorloopt.\n\uF0B7 Het aantal storingen !Storing waarvoor
+      geldt !Storing.#conditiewaarde = ja, waarbij !Storing de verzameling van storingen
+      van hoogtedetectie doorloopt."
+  code: "\nfunction Hoogtedetectie_Hoogtedetectie_#aantal_actieve_storingen(id) {\n
+    \ const Hoogtedetectie = AIM(id);\n  if (\n    1\n  ) {\n    return Hoogtedetectie.De
+    Hoogtedetectie.som Hoogtedetectie.van Hoogtedetectie.de Hoogtedetectie.volgende
+    Hoogtedetectie.aantallen: \uF0B7 Hoogtedetectie.Het Hoogtedetectie.aantal Hoogtedetectie.storingen
+    Hoogtedetectie._bf_whd.!Storing Hoogtedetectie.waarvoor Hoogtedetectie.geldt Hoogtedetectie._bf_whd.!Storing.#conditiewaarde
+    = JA, Hoogtedetectie.waarbij !Storing Hoogtedetectie.de Hoogtedetectie.verzameling
+    Hoogtedetectie.van (generieke Hoogtedetectie.en Hoogtedetectie.specifieke) Hoogtedetectie.storingen
+    Hoogtedetectie.van Hoogtedetectie.hoogtedetector Hoogtedetectie.doorloopt.\n\uF0B7
+    Hoogtedetectie.Het Hoogtedetectie.aantal Hoogtedetectie.storingen Hoogtedetectie._bf_rhd.!Storing
+    Hoogtedetectie.waarvoor Hoogtedetectie.geldt Hoogtedetectie._bf_rhd.!Storing.#conditiewaarde
+    = JA, Hoogtedetectie.waarbij !Storing Hoogtedetectie.de Hoogtedetectie.verzameling
+    Hoogtedetectie.van (generieke Hoogtedetectie.en Hoogtedetectie.specifieke) Hoogtedetectie.storingen
+    Hoogtedetectie.van Hoogtedetectie.hoogtedetector Hoogtedetectie.doorloopt.\n\uF0B7
+    Hoogtedetectie.Het Hoogtedetectie.aantal Hoogtedetectie.storingen !Storing Hoogtedetectie.waarvoor
+    Hoogtedetectie.geldt !Storing.#conditiewaarde = JA, Hoogtedetectie.waarbij !Storing
+    Hoogtedetectie.de Hoogtedetectie.verzameling Hoogtedetectie.van Hoogtedetectie.storingen
+    Hoogtedetectie.van Hoogtedetectie.hoogtedetectie Hoogtedetectie.doorloopt.;\n
+    \ }\n}"
+Hoogtedetectie_#aantal_onderdrukt:
+  name: Hoogtedetectie_#aantal_onderdrukt
+  description: "0..n Het aantal signaleringen van \xE9\xE9n of beide hoogtedetectoren
+    of van hoogtedetectie dat onderdrukt is.\nHierbij is 'n' het aantal (generieke
+    en specifieke) onderdrukbare signaleringen dat beide hoogtedetectoren en hoogtedetectie
+    in totaal hebben.\n\n"
+  waarde:
+  - als: 1
+    dan: |-
+      Het aantal signaleringen !Signalering waarvoor geldt !Signalering.#onderdrukt = ja, waarbij !Signalering de verzameling van (generieke en specifieke) signaleringen (d.w.z.
+      statusmeldingen, storingen, verkeerskundige alarmen en deelsysteem-alarmen) van hoogtedetectie en van beide instanties van de hoogtedetector doorloopt.
+  code: |2-
+
+    function Hoogtedetectie_Hoogtedetectie_#aantal_onderdrukt(id) {
+      const Hoogtedetectie = AIM(id);
+      if (
+        1
+      ) {
+        return Hoogtedetectie.Het Hoogtedetectie.aantal Hoogtedetectie.signaleringen !Signalering Hoogtedetectie.waarvoor Hoogtedetectie.geldt !Signalering.#onderdrukt = JA, Hoogtedetectie.waarbij !Signalering Hoogtedetectie.de Hoogtedetectie.verzameling Hoogtedetectie.van (generieke Hoogtedetectie.en Hoogtedetectie.specifieke) Hoogtedetectie.signaleringen (d.w.z.
+    Hoogtedetectie.statusmeldingen, Hoogtedetectie.storingen, Hoogtedetectie.verkeerskundige Hoogtedetectie.alarmen Hoogtedetectie.en Hoogtedetectie.deelsysteem-alarmen) Hoogtedetectie.van Hoogtedetectie.hoogtedetectie Hoogtedetectie.en Hoogtedetectie.van Hoogtedetectie.beide Hoogtedetectie.instanties Hoogtedetectie.van Hoogtedetectie.de Hoogtedetectie.hoogtedetector Hoogtedetectie.doorloopt.;
+      }
+    }
+Hoogtedetectie_ResetWaarschuwingsfase:
+  name: Hoogtedetectie_ResetWaarschuwingsfase
+  description: Reset de waarschuwingsfase status van de hoogtedetectie. De hoogtedetectie
+    van de WHD wordt gereset.
+  actie:
+  - als: '_bf_whd.#beschikbaarheid <> niet_beschikbaar && #in_gebruik = ja'
+    dan:
+    - _bf_whd.ResetHoogtedetector()
+  code: |-
+    function Hoogtedetectie_Hoogtedetectie_ResetWaarschuwingsfase(id) {
+      const Hoogtedetectie = AIM(id);
+      if (
+        Hoogtedetectie._bf_whd.#beschikbaarheid != NIET_BESCHIKBAAR &&
+        Hoogtedetectie.#in_gebruik === JA
+      ) {
+    _bf_whd.ResetHoogtedetector();
+      }
+    }
+Hoogtedetectie_ResetRoodfase:
+  name: Hoogtedetectie_ResetRoodfase
+  description: Reset de rood fase status van de hoogtedetectie. De hoogtedetectie
+    van de RHD wordt gereset.
+  actie:
+  - als: '_bf_rhd.#beschikbaarheid <> niet_beschikbaar && #in_gebruik = ja'
+    dan:
+    - _bf_rhd.ResetHoogtedetector()
+  code: |-
+    function Hoogtedetectie_Hoogtedetectie_ResetRoodfase(id) {
+      const Hoogtedetectie = AIM(id);
+      if (
+        Hoogtedetectie._bf_rhd.#beschikbaarheid != NIET_BESCHIKBAAR &&
+        Hoogtedetectie.#in_gebruik === JA
+      ) {
+    _bf_rhd.ResetHoogtedetector();
+      }
+    }
+Hoogtedetector_SetDisabled:
+  name: Hoogtedetector_SetDisabled
+  description: Disable de functie hoogtedetector. Het autonome gedrag van de LFV wordt
+    nu uitgeschakeld.
+  actie:
+  - als: _lfv_hd.#bestuurbaar = ja && _lfv_hd.#hoogte_overschrijding <> detector_disabled
+    dan:
+    - _lfv_hd.SetHoogteOverschrijding(detector_disabled)
+    - '#enabled := nee'
+  - als: _lfv_hd.#bestuurbaar = nee
+    dan:
+    - '#enabled := nee'
+  code: |-
+    function Hoogtedetector_Hoogtedetector_SetDisabled(id) {
+      const Hoogtedetector = AIM(id);
+      if (
+        Hoogtedetector._lfv_hd.#bestuurbaar === JA &&
+        Hoogtedetector._lfv_hd.#hoogte_overschrijding != DETECTOR_DISABLED
+      ) {
+    _lfv_hd.SetHoogteOverschrijding(detector_disabled);
+        Hoogtedetector.#enabled = NEE;
+      } else if (
+        Hoogtedetector._lfv_hd.#bestuurbaar === NEE
+      ) {
+    #enabled = NEE;
+      }
+    }
+Hoogtedetectie_Enable:
+  name: Hoogtedetectie_Enable
+  description: "Enable de co\xF6rdinerende functie hoogtedetectie. Als hoogtedetectie
+    is enabled (#enabled = ja) worden de signaleringen en het autonome gedrag van
+    hoogtedetectie uitgevoerd."
+  actie:
+  - '#enabled := ja'
+  code: |-
+    function Hoogtedetectie_Hoogtedetectie_Enable(id) {
+      const Hoogtedetectie = AIM(id);
+      return #enabled := ja
+    }
+Hoogtedetectie_Disable:
+  name: Hoogtedetectie_Disable
+  description: Disable de functie hoogtedetectie.
+  actie:
+  - '#enabled := nee'
+  code: |-
+    function Hoogtedetectie_Hoogtedetectie_Disable(id) {
+      const Hoogtedetectie = AIM(id);
+      return #enabled := nee
+    }
+Hoogtedetectie_SetInGebruik:
+  name: Hoogtedetectie_SetInGebruik
+  description: Besturing die voor toepassing in wisselbuizen gebruikt wordt om deze
+    instantie van hoogtedetectie in of uit te schakelen. Wanneer aangeroepen met het
+    argument 'ja', dan moet de hoogtedetectie functioneren als bij een verkeersbuis
+    die geen wisselbuis is. Wanneer aangeroepen met de argument 'nee', dan moet deze
+    hoogtedetectie de bijbehorende hoogtedetectoren op 'disabled' zetten, maar moeten
+    overige detecties en signaleringen normaal blijven functioneren.
+  params: 'in_gebruik: ja | nee'
+  actie:
+  - |-
+    #in_gebruik := in_gebruik _bf_whd.SetInGebruik(in_gebruik)
+    _bf_rhd.SetInGebruik(in_gebruik)
+  code: |-
+    function Hoogtedetectie_Hoogtedetectie_SetInGebruik(id) {
+      const Hoogtedetectie = AIM(id);
+      return #in_gebruik := in_gebruik _bf_whd.SetInGebruik(in_gebruik)
+    _bf_rhd.SetInGebruik(in_gebruik)
+    }
+Hoogtedetectie_*BewaakVerkeersbuishoogte:
+  name: Hoogtedetectie_*BewaakVerkeersbuishoogte
+  description: De tweede hoogte detector geeft aan dat een te hoog voertuig gedetecteerd
+    is. De verkeersbuis wordt afgesloten.
+  actie:
+  - als: '#enabled = ja && #in_gebruik = ja && #status = roodfase'
+    dan:
+    - _cf_verkeersbuis_afsluiter.Auto_VerkeerslichtenRood()
+  code: |-
+    function Hoogtedetectie_Hoogtedetectie_*BewaakVerkeersbuishoogte(id) {
+      const Hoogtedetectie = AIM(id);
+      if (
+        Hoogtedetectie.#enabled === JA &&
+        Hoogtedetectie.#in_gebruik === JA &&
+        Hoogtedetectie.#status === ROODFASE
+      ) {
+    _cf_verkeersbuis_afsluiter.Auto_VerkeerslichtenRood();
+      }
+    }
+Hoogtedetectie_*KnipperenGeel:
+  name: Hoogtedetectie_*KnipperenGeel
+  description: Zet het geel knipperlicht aan als de Waarschuwingsfase actief wordt.
+    Het feit dat VerkeersbuisAfsluiter bij besturingen alleen verzwaringen toestaat
+    zorgt ervoor dat de VerkeersbuisAfsluiter nooit van rood naar geel knipper gezet
+    kan worden door deze opdracht.
+  actie:
+  - als: '#enabled = ja && #in_gebruik = ja && #status = waarschuwingsfase'
+    dan:
+    - _cf_verkeersbuis_afsluiter.Auto_VerkeerslichtenGeelKnipper()
+  code: |-
+    function Hoogtedetectie_Hoogtedetectie_*KnipperenGeel(id) {
+      const Hoogtedetectie = AIM(id);
+      if (
+        Hoogtedetectie.#enabled === JA &&
+        Hoogtedetectie.#in_gebruik === JA &&
+        Hoogtedetectie.#status === WAARSCHUWINGSFASE
+      ) {
+    _cf_verkeersbuis_afsluiter.Auto_VerkeerslichtenGeelKnipper();
+      }
+    }
+SOS_#beschikbaarheid:
+  name: SOS_#beschikbaarheid
+  description: |
+    Geeft de beschikbaarheid van de functie aan.
+    De beschikbaarheid van de SOS-sectie is gedefinieerd als 'niet_beschikbaar' indien twee of meer detectoren in de sectie een storing hebben, en als 'beperkt_beschikbaar' indien precies een detector in de sectie een storing heeft.
+    Als geen enkele detector een storing heeft, is de beschikbaarheid van de SOS-sectie gedefinieerd als 'beschikbaar'.
+  enum:
+  - niet_beschikbaar
+  - beperkt_beschikbaar
+  - beschikbaar
+  waarde:
+  - als: 1
+    dan: "IF ( _rijstrook = _lfv_sos.#detectoren_met_storing[i].rijstrook &&   _start
+      \u2264 _lfv_sos.#detectoren_met_storing[i].lengtepositie \u2264 _eind ) &&      (
+      _rijstrook = _lfv_sos.#detectoren_met_storing[j].rijstrook &&      _start \u2264
+      _lfv_sos.#detectoren_met_storing[j].lengtepositie \u2264 _eind )    && (j <>
+      i) THEN #beschikbaarheid := niet_beschikbaar ELSIF ( _rijstrook = _lfv_sos.#detectoren_met_storing[i].rijstrook
+      &&      _start \u2264 _lfv_sos.#detectoren_met_storing[i].lengtepositie \u2264
+      _eind ) THEN #beschikbaarheid := beperkt_beschikbaar ELSE #beschikbaarheid :=
+      beschikbaar END_IF"
+  - als: _lfv_sos.#bestuurbaar = nee || _sf_sos_sectie[].#beschikbaarheid = niet_beschikbaar
+      || _lfv_sos.#storingen[i] = STORING_SOS_60M_TOT_150M || _lfv_sos.#storingen[j]
+      = STORING_SOS_150M_PLUS
+    dan: niet_beschikbaar
+  - als: 1
+    dan: beperkt_beschikbaar
+  code: "\nfunction SOS_SOS_#beschikbaarheid(id) {\n  const SOS = AIM(id);\n  if (\n
+    \   1\n  ) {\n    return SOS.IF ( SOS._rijstrook = SOS._lfv_sos.#detectoren_met_storing[i].rijstrook
+    &&   SOS._start \u2264 SOS._lfv_sos.#detectoren_met_storing[i].lengtepositie \u2264
+    SOS._eind ) &&      ( SOS._rijstrook = SOS._lfv_sos.#detectoren_met_storing[j].rijstrook
+    &&      SOS._start \u2264 SOS._lfv_sos.#detectoren_met_storing[j].lengtepositie
+    \u2264 SOS._eind )    && (j <> SOS.i) SOS.THEN SOS.#beschikbaarheid := NIET_BESCHIKBAAR
+    SOS.ELSIF ( SOS._rijstrook = SOS._lfv_sos.#detectoren_met_storing[i].rijstrook
+    &&      SOS._start \u2264 SOS._lfv_sos.#detectoren_met_storing[i].lengtepositie
+    \u2264 SOS._eind ) SOS.THEN SOS.#beschikbaarheid := BEPERKT_BESCHIKBAAR SOS.ELSE
+    SOS.#beschikbaarheid := BESCHIKBAAR SOS.END_IF;\n  }\n}"
+SOS_#spookrijder_detectie_enabled:
+  name: SOS_#spookrijder_detectie_enabled
+  description: |-
+    Geeft aan of het detecteren van spookrijders enabled is.
+    Als spookrijder detectie enabled is zullen de variabelen en signaleringen gerelateerd aan spookrijders actief zijn.
+    Init:
+     ja
+  enum:
+  - ja
+  - nee
+  code: |2-
+
+    function SOS_SOS_#spookrijder_detectie_enabled(id) {
+      const SOS = AIM(id);
+      undefined
+    }
+SOS_#richting:
+  name: SOS_#richting
+  description: |
+    Geeft de werkelijk gebruikte rijrichting voor SOS.
+  enum:
+  - aflopend
+  - oplopend
+  waarde:
+  - als: _lfv_sos.#observeerbaar = ja && _lfv_sos.#richting = aflopend
+    dan: aflopend
+  - als: _lfv_sos.#observeerbaar = ja && _lfv_sos.#richting = oplopend
+    dan: oplopend
+  code: |2-
+
+    function SOS_SOS_#richting(id) {
+      const SOS = AIM(id);
+      if (
+        SOS._lfv_sos.#observeerbaar === JA &&
+        SOS._lfv_sos.#richting === AFLOPEND
+      ) {
+        return AFLOPEND;
+      }
+      else if (
+        SOS._lfv_sos.#observeerbaar === JA &&
+        SOS._lfv_sos.#richting === OPLOPEND
+      ) {
+        return OPLOPEND;
+      }
+    }
+SOS_#doel_richting:
+  name: SOS_#doel_richting
+  description: |-
+    PERSISTENT Geeft de rijrichting die SOS zou moeten gebruiken.
+    Als _omkeerbaar = nee, dient dit altijd de ontwerprijrichting van de verkeersbuis te zijn.
+  enum:
+  - aflopend
+  - oplopend
+  code: |2-
+
+    function SOS_SOS_#doel_richting(id) {
+      const SOS = AIM(id);
+      undefined
+    }
+SOS_#transitiestatus:
+  name: SOS_#transitiestatus
+  description: ""
+  enum:
+  - bereikt
+  - niet_bereikt
+  - in_transitie
+  waarde:
+  - als: 1
+    dan: 'transitiestatus_patroon( #richting = #doel_richting, #doel_richting, #transitiestatus_tijdstip,
+      _max_transitietijd)'
+  code: |2-
+
+    function SOS_SOS_#transitiestatus(id) {
+      const SOS = AIM(id);
+      if (
+        1
+      ) {
+        return SOS.transitiestatus_patroon( SOS.#richting = SOS.#doel_richting, SOS.#doel_richting, SOS.#transitiestatus_tijdstip, SOS._max_transitietijd);
+      }
+    }
+SOS_#transitiestatus_tijdstip:
+  name: SOS_#transitiestatus_tijdstip
+  description: |-
+    tijdstip Het tijdstip waarop de huidige transitiestatus-waarde bereikt is.
+    Init:
+     0 Per subfunctie SOSsectie zijn er de volgende variabelen:
+  code: |2-
+
+    function SOS_SOS_#transitiestatus_tijdstip(id) {
+      const SOS = AIM(id);
+      undefined
+    }
+SOS_#enabled:
+  name: SOS_#enabled
+  description: "Geeft aan of er detectoren in deze sectie uitgeschakeld zijn, resulterend
+    in waarde nee, anders ja.\nDe waarde wordt op elk moment bepaald door de waarde
+    van de toestandsvariabele _lfv_sos.#disabled_detectiepunten, als volgt:\n \n"
+  enum:
+  - ja
+  - nee
+  waarde:
+  - als: _lfv_sos.#observeerbaar = ja
+    dan: "IF ( _rijstrook = _lfv_sos.#disabled_detectiepunten[i].rijstrook &&     _start
+      \u2264 _lfv_sos.#disabled_detectiepunten[i].lengtepositie \u2264 _eind ) THEN
+      #enabled := nee ELSE #enabled := ja END_IF"
+  code: "\nfunction SOS_SOS_#enabled(id) {\n  const SOS = AIM(id);\n  if (\n    SOS._lfv_sos.#observeerbaar
+    === JA\n  ) {\n    return SOS.IF ( SOS._rijstrook = SOS._lfv_sos.#disabled_detectiepunten[i].rijstrook
+    &&     SOS._start \u2264 SOS._lfv_sos.#disabled_detectiepunten[i].lengtepositie
+    \u2264 SOS._eind ) SOS.THEN SOS.#enabled := NEE SOS.ELSE SOS.#enabled := JA SOS.END_IF;\n
+    \ }\n}"
+SOS_#meldingen_gewenst:
+  name: SOS_#meldingen_gewenst
+  description: Geeft aan of de signaleringen van deze sectie gewenst zijn volgens
+    auto/hand aansturing.
+  enum:
+  - ja
+  - nee
+  code: |2-
+
+    function SOS_SOS_#meldingen_gewenst(id) {
+      const SOS = AIM(id);
+      undefined
+    }
+SOS_#stilstand:
+  name: SOS_#stilstand
+  description: |
+    Geeft aan of er een stilstand in deze sectie is.
+  enum:
+  - ja
+  - nee
+  waarde:
+  - als: '#enabled = ja && _lfv_sos.#observeerbaar = ja'
+    dan: "_rijstrook = _lfv_sos.#stilstanden[i].rijstrook &&  _start \u2264 _lfv_sos.#stilstanden[i].lengtepositie
+      \u2264 _eind"
+  code: "\nfunction SOS_SOS_#stilstand(id) {\n  const SOS = AIM(id);\n  if (\n    SOS.#enabled
+    === JA &&\n    SOS._lfv_sos.#observeerbaar === JA\n  ) {\n    return SOS._rijstrook
+    = SOS._lfv_sos.#stilstanden[i].rijstrook &&  SOS._start \u2264 SOS._lfv_sos.#stilstanden[i].lengtepositie
+    \u2264 SOS._eind;\n  }\n}"
+SOS_#spookrijder:
+  name: SOS_#spookrijder
+  description: |
+    Geeft aan of er een spookrijder in deze SOS-sectie gedetecteerd is.
+  enum:
+  - ja
+  - nee
+  waarde:
+  - als: '#enabled = ja && _bf_sos.#spookrijder_detectie_enabled = ja &&  _lfv_sos.#observeerbaar
+      = ja'
+    dan: "_rijstrook = _lfv_sos.#spookrijders[i].rijstrook &&  _start \u2264 _lfv_sos.#spookrijders[i].lengtepositie
+      \u2264 _eind"
+  code: "\nfunction SOS_SOS_#spookrijder(id) {\n  const SOS = AIM(id);\n  if (\n    SOS.#enabled
+    === JA &&\n    SOS._bf_sos.#spookrijder_detectie_enabled === JA &&\n     SOS._lfv_sos.#observeerbaar
+    === JA\n  ) {\n    return SOS._rijstrook = SOS._lfv_sos.#spookrijders[i].rijstrook
+    &&  SOS._start \u2264 SOS._lfv_sos.#spookrijders[i].lengtepositie \u2264 SOS._eind;\n
+    \ }\n}"
+SOS_#sos_sectie_status:
+  name: SOS_#sos_sectie_status
+  description: |-
+    De beschikbaarheid van deze SOS-sectie.
+    De waarde volgens de volgende tabel:
+     #beschikbaarheid #enabled #sos_sectie_status * nee disabled niet_beschikbaar ja niet_beschikbaar beperkt_beschikbaar ja beperkt_beschikbaar beschikbaar ja beschikbaar  Tabel 10-2: Waarheidstabel SOS-sectie status
+  enum:
+  - disabled
+  - niet_beschikbaar
+  - beperkt_beschikbaar
+  - beschikbaar
+  code: |2-
+
+    function SOS_SOS_#sos_sectie_status(id) {
+      const SOS = AIM(id);
+      undefined
+    }
+SOS_EnableSpookrijderDetectie:
+  name: SOS_EnableSpookrijderDetectie
+  description: Enable spookrijder-detectie
+  actie:
+  - '#spookrijder_detectie_enabled := ja'
+  code: |-
+    function SOS_SOS_EnableSpookrijderDetectie(id) {
+      const SOS = AIM(id);
+      return #spookrijder_detectie_enabled := ja
+    }
+SOS_DisableSpookrijderDetectie:
+  name: SOS_DisableSpookrijderDetectie
+  description: Disable spookrijder-detectie
+  actie:
+  - '#spookrijder_detectie_enabled := nee De bedieningen per subfunctie SOSsectie
+    zijn:'
+  code: |-
+    function SOS_SOS_DisableSpookrijderDetectie(id) {
+      const SOS = AIM(id);
+      return #spookrijder_detectie_enabled := nee De bedieningen per subfunctie SOSsectie zijn:
+    }
+SOS_EnableEnHandStopOnderdrukkenSosSectie:
+  name: SOS_EnableEnHandStopOnderdrukkenSosSectie
+  description: Enable de SOS-sectie en stop het (handmatig) onderdrukken van alarmen.
+    Als een SOS-sectie disabled is wordt de informatie van deze sectie niet gebruikt
+    in 3B.
+  actie:
+  - |-
+    _lfv_sos.EnableDetector( _rijstrook, _start, _eind, ja )
+     HandStopOnderdrukkenMeldingen()
+  code: |-
+    function SOS_SOS_EnableEnHandStopOnderdrukkenSosSectie(id) {
+      const SOS = AIM(id);
+      return _lfv_sos.EnableDetector( _rijstrook, _start, _eind, ja )
+     HandStopOnderdrukkenMeldingen()
+    }
+SOS_DisableSosSectie:
+  name: SOS_DisableSosSectie
+  description: Disable de SOS-sectie. Als een SOS-sectie disabled is wordt de informatie
+    van deze sectie niet gebruikt in 3B.
+  actie:
+  - _lfv_sos.EnableDetector( _rijstrook, _start, _eind, nee )
+  code: |-
+    function SOS_SOS_DisableSosSectie(id) {
+      const SOS = AIM(id);
+      return _lfv_sos.EnableDetector( _rijstrook, _start, _eind, nee )
+    }
+SOS_HandStartOnderdrukkenMeldingen:
+  name: SOS_HandStartOnderdrukkenMeldingen
+  description: De verkeerskundige alarmen van deze SOS-sectie worden onderdrukt.
+  actie:
+  - |-
+    #meldingen_gewenst:=nee  !Alarm_StilstandGedetecteerd.StartOnderdrukken()  !Alarm_SnelheidsonderschrijdingGedetecteerd.StartOnderdrukken()
+     !Alarm_SpookrijderGedetecteerd.StartOnderdrukken()
+  code: |-
+    function SOS_SOS_HandStartOnderdrukkenMeldingen(id) {
+      const SOS = AIM(id);
+      return #meldingen_gewenst:=nee  !Alarm_StilstandGedetecteerd.StartOnderdrukken()  !Alarm_SnelheidsonderschrijdingGedetecteerd.StartOnderdrukken()
+     !Alarm_SpookrijderGedetecteerd.StartOnderdrukken()
+    }
+SOS_HandStopOnderdrukkenMeldingen:
+  name: SOS_HandStopOnderdrukkenMeldingen
+  description: De verkeerskundige alarmen van deze SOS-sectie worden niet onderdrukt.
+  actie:
+  - |-
+    #meldingen_gewenst:=ja !Alarm_StilstandGedetecteerd.StopOnderdrukken() !Alarm_SnelheidsonderschrijdingGedetecteerd.StopOnderdrukken()
+     !Alarm_SpookrijderGedetecteerd.StopOnderdrukken()
+  code: |-
+    function SOS_SOS_HandStopOnderdrukkenMeldingen(id) {
+      const SOS = AIM(id);
+      return #meldingen_gewenst:=ja !Alarm_StilstandGedetecteerd.StopOnderdrukken() !Alarm_SnelheidsonderschrijdingGedetecteerd.StopOnderdrukken()
+     !Alarm_SpookrijderGedetecteerd.StopOnderdrukken()
+    }
+SOS_SetRichting:
+  name: SOS_SetRichting
+  description: Stelt de richting van SOS in.
+  params: 'richting: oplopend | aflopend'
+  actie:
+  - als: _omkeerbaar = ja
+    dan:
+    - '#doel_richting := richting'
+  code: |-
+    function SOS_SOS_SetRichting(id) {
+      const SOS = AIM(id);
+      if (
+        SOS._omkeerbaar === JA
+      ) {
+    #doel_richting = SOS.richting;
+      }
+    }
+SOS_AutoStartOnderdrukkenMeldingen:
+  name: SOS_AutoStartOnderdrukkenMeldingen
+  description: De verkeerskundige alarmen van SOS worden onderdrukt.
+  actie:
+  - |-
+    _sf_sos_sectie[].#meldingen_gewenst:=nee _sf_sos_sectie[].!Alarm_StilstandGedetecteerd.StartOnderdrukken() _sf_sos_sectie[].!Alarm_SnelheidsonderschrijdingGedetecteerd.StartOnderdrukken()
+    _sf_sos_sectie[].!Alarm_SpookrijderGedetecteerd.StartOnderdrukken()
+  code: |-
+    function SOS_SOS_AutoStartOnderdrukkenMeldingen(id) {
+      const SOS = AIM(id);
+      return _sf_sos_sectie[].#meldingen_gewenst:=nee _sf_sos_sectie[].!Alarm_StilstandGedetecteerd.StartOnderdrukken() _sf_sos_sectie[].!Alarm_SnelheidsonderschrijdingGedetecteerd.StartOnderdrukken()
+    _sf_sos_sectie[].!Alarm_SpookrijderGedetecteerd.StartOnderdrukken()
+    }
+SOS_AutoStopOnderdrukkenMeldingen:
+  name: SOS_AutoStopOnderdrukkenMeldingen
+  description: De verkeerskundige alarmen van SOS worden niet onderdrukt.
+  actie:
+  - |-
+    _sf_sos_sectie[].#meldingen_gewenst:=ja _sf_sos_sectie[].!Alarm_StilstandGedetecteerd.StopOnderdrukken() _sf_sos_sectie[].!Alarm_SnelheidsonderschrijdingGedetecteerd.StopOnderdrukken()
+    _sf_sos_sectie[].!Alarm_SpookrijderGedetecteerd.StopOnderdrukken()
+  code: |-
+    function SOS_SOS_AutoStopOnderdrukkenMeldingen(id) {
+      const SOS = AIM(id);
+      return _sf_sos_sectie[].#meldingen_gewenst:=ja _sf_sos_sectie[].!Alarm_StilstandGedetecteerd.StopOnderdrukken() _sf_sos_sectie[].!Alarm_SnelheidsonderschrijdingGedetecteerd.StopOnderdrukken()
+    _sf_sos_sectie[].!Alarm_SpookrijderGedetecteerd.StopOnderdrukken()
+    }
+SOS_*HandhaafInstellingen:
+  name: SOS_*HandhaafInstellingen
+  description: Zorgt dat de rijrichting wordt gehandhaafd. Dit autonome proces draagt
+    er ook zorg voor dat bij de overgang van niet bestuurbaarheid naar bestuurbaarheid
+    het juiste gedrag weergegeven wordt.
+  actie:
+  - als: '_lfv_sos.#bestuurbaar = ja && _lfv_sos.#richting <> #doel_richting'
+    dan:
+    - _lfv_sos.SetRichting(#doel_richting)
+  code: |-
+    function SOS_SOS_*HandhaafInstellingen(id) {
+      const SOS = AIM(id);
+      if (
+        SOS._lfv_sos.#bestuurbaar === JA &&
+        SOS._lfv_sos.#richting != SOS.#doel_richting
+      ) {
+    _lfv_sos.SetRichting(#doel_richting);
+      }
+    }
+SOS_*OnderdrukSnelheidsonderschrijdingAlarmen:
+  name: SOS_*OnderdrukSnelheidsonderschrijdingAlarmen
+  description: Onderdruk als een SOS sectie stroomafwaarts, en maximaal het _aantal_te_onderdrukken_secties
+    weg, een snelheidsonderschrijding heeft gedetecteerd.
+  actie:
+  - als: _lfv_sos.#observeerbaar = ja && _lfv_sos.#richting = oplopend && _sf_sos_sectie[r,
+      i].#meldingen_gewenst = ja &&  _sf_sos_sectie[r, i].#snelheidsonderschrijding
+      = ja
+    dan:
+    - "\uF022j( i - _aantal_te_onderdrukken_secties \u2264 j < i : _sf_sos_sectie[r,
+      j]."
+    - '!Alarm_SnelheidsonderschrijdingGedetecteerd.StartOnderdrukken() )'
+  - als: _lfv_sos.#observeerbaar = ja &&  _lfv_sos.#richting= aflopend &&  _sf_sos_sectie[r,
+      i].#meldingen_gewenst = ja &&  _sf_sos_sectie[r, i].#snelheidsonderschrijding
+      = ja
+    dan:
+    - "\uF022j( i"
+    - '!Alarm_SnelheidsonderschrijdingGedetecteerd.StartOnderdrukken() )'
+    - Merk op dat de acties voor iedere i moeten worden uitgevoerd waarvoor de conditie
+      waar is, waardoor een rij van aaneensluitende secties die onderdrukt worden
+      dynamisch kan groeien.
+  code: "function SOS_SOS_*OnderdrukSnelheidsonderschrijdingAlarmen(id) {\n  const
+    SOS = AIM(id);\n  if (\n    SOS._lfv_sos.#observeerbaar === JA &&\n    SOS._lfv_sos.#richting
+    === OPLOPEND &&\n    SOS._sf_sos_sectie[r, SOS.i].#meldingen_gewenst === JA &&\n
+    \    SOS._sf_sos_sectie[r, SOS.i].#snelheidsonderschrijding === JA\n  ) {\n\uF022j(
+    SOS.i - SOS._aantal_te_onderdrukken_secties \u2264 SOS.j < SOS.i : SOS._sf_sos_sectie[r,
+    SOS.j].;\n    !Alarm_SnelheidsonderschrijdingGedetecteerd.StartOnderdrukken()
+    );\n  } else if (\n    SOS._lfv_sos.#observeerbaar === JA &&\n     SOS._lfv_sos.#richting
+    === AFLOPEND &&\n     SOS._sf_sos_sectie[r, SOS.i].#meldingen_gewenst === JA &&\n
+    \    SOS._sf_sos_sectie[r, SOS.i].#snelheidsonderschrijding === JA\n  ) {\n\uF022j(
+    SOS.i;\n  }\n}"
+SOS_*StopOnderdrukkenSnelheidsonderschrijdingAlarmen:
+  name: SOS_*StopOnderdrukkenSnelheidsonderschrijdingAlarmen
+  description: Stop onderdrukken als alle SOS secties stroomafwaarts, tot het _aantal_te_onderdrukken_secties
+    weg, geen snelheidsonderschrijding hebben gedetecteerd.
+  actie:
+  - als: "_lfv_sos.#observeerbaar = ja && _lfv_sos.#richting = oplopend &&  _sf_sos_sectie[r,
+      i].#meldingen_gewenst = ja && \uF020\uF020\uF022j( i \u2264 j \u2264 i + _aantal_te_onderdrukken_secties
+      \uF020\uF0DE _sf_sos_sectie[r, j].#snelheidsonderschrijding = nee )"
+    dan:
+    - _sf_sos_sectie[r, i].
+    - '!Alarm_SnelheidsonderschrijdingGedetecteerd.StopOnderdrukken()'
+  - als: "_lfv_sos.#observeerbaar = ja && _lfv_sos.#richting = aflopend &&  _sf_sos_sectie[r,
+      i].#meldingen_gewenst = ja &&  \uF022j( i - _aantal_te_onderdrukken_secties
+      \u2264 j \u2264 i \uF0DE _sf_sos_sectie[r, j].#snelheidsonderschrijding = nee
+      )"
+    dan:
+    - _sf_sos_sectie[r, i].
+    - '!Alarm_SnelheidsonderschrijdingGedetecteerd.StopOnderdrukken()'
+    - Merk op dat de acties voor iedere i moeten worden uitgevoerd waarvoor de conditie
+      waar is, waardoor een rij van aaneensluitende secties waarvan het onderdrukken
+      gestopt is dynamisch kan groeien.
+  code: "function SOS_SOS_*StopOnderdrukkenSnelheidsonderschrijdingAlarmen(id) {\n
+    \ const SOS = AIM(id);\n  if (\n    SOS._lfv_sos.#observeerbaar === JA &&\n    SOS._lfv_sos.#richting
+    === OPLOPEND &&\n     SOS._sf_sos_sectie[r, SOS.i].#meldingen_gewenst === JA &&\n
+    \   \uF020\uF020\uF022j( SOS.i \u2264 SOS.j \u2264 SOS.i + SOS._aantal_te_onderdrukken_secties
+    \uF020\uF0DE SOS._sf_sos_sectie[r, SOS.j].#snelheidsonderschrijding === NEE )\n
+    \ ) {\n_sf_sos_sectie[r, SOS.i].;\n    !Alarm_SnelheidsonderschrijdingGedetecteerd.StopOnderdrukken();\n
+    \ } else if (\n    SOS._lfv_sos.#observeerbaar === JA &&\n    SOS._lfv_sos.#richting
+    === AFLOPEND &&\n     SOS._sf_sos_sectie[r, SOS.i].#meldingen_gewenst === JA &&\n
+    \    \uF022j( SOS.i - SOS._aantal_te_onderdrukken_secties \u2264 SOS.j \u2264
+    SOS.i \uF0DE SOS._sf_sos_sectie[r, SOS.j].#snelheidsonderschrijding === NEE )\n
+    \ ) {\n_sf_sos_sectie[r, SOS.i].;\n    !Alarm_SnelheidsonderschrijdingGedetecteerd.StopOnderdrukken();\n
+    \   SOS.Merk OP SOS.dat SOS.de SOS.acties SOS.voor SOS.iedere SOS.i SOS.moeten
+    SOS.worden SOS.uitgevoerd SOS.waarvoor SOS.de SOS.conditie SOS.waar SOS.is, SOS.waardoor
+    SOS.een SOS.rij SOS.van SOS.aaneensluitende SOS.secties SOS.waarvan SOS.het SOS.onderdrukken
+    GESTOPT SOS.is SOS.dynamisch SOS.kan SOS.groeien.;\n  }\n}"
+Omroep Verkeersbuis_StopToesprekenVerkeersbuis:
+  name: Omroep Verkeersbuis_StopToesprekenVerkeersbuis
+  description: 'Stop met live toespreken in deze verkeersbuis, dat wil zeggen: schakel
+    de OmroepVerkeersbuis uit, of continueer het afspelen van de boodschap.'
+  actie:
+  - als: "#gebruiksmode = toespreken && \n#boodschap_continueren = nee"
+    dan:
+    - '#gebruiksmode := uit'
+  - als: "#gebruiksmode = toespreken && \n#boodschap_continueren = ja && \n#boodschap_sectie
+      = ALLE_SECTIES"
+    dan:
+    - _sf_sectie[].#stand := aan;
+    - '#gebruiksmode := boodschap_afspelen;'
+  - als: "#gebruiksmode = toespreken && \n#boodschap_continueren = ja && \n#boodschap_sectie
+      <> ongeldig && \n#boodschap_sectie <> ALLE_SECTIES"
+    dan:
+    - _sf_sectie[].#stand := uit;
+    - _sf_sectie[#boodschap_sectie].#stand := aan;
+    - '#gebruiksmode := boodschap_afspelen;'
+  code: "function Omroep Verkeersbuis_Omroep Verkeersbuis_StopToesprekenVerkeersbuis(id)
+    {\n  const Omroep Verkeersbuis = AIM(id);\n  if (\n    Omroep Verkeersbuis.#gebruiksmode
+    === TOESPREKEN &&\n    \nOmroep Verkeersbuis.#boodschap_continueren === NEE\n
+    \ ) {\n#gebruiksmode = UIT;\n  } else if (\n    Omroep Verkeersbuis.#gebruiksmode
+    === TOESPREKEN &&\n    \nOmroep Verkeersbuis.#boodschap_continueren === JA &&\n
+    \   \nOmroep Verkeersbuis.#boodschap_sectie === ALLE_SECTIES\n  ) {\n_sf_sectie[].#stand
+    = AAN;;\n    Omroep Verkeersbuis.#gebruiksmode = BOODSCHAP_AFSPELEN;;\n  } else
+    if (\n    Omroep Verkeersbuis.#gebruiksmode === TOESPREKEN &&\n    \nOmroep Verkeersbuis.#boodschap_continueren
+    === JA &&\n    \nOmroep Verkeersbuis.#boodschap_sectie != Omroep Verkeersbuis.ongeldig
+    &&\n    \nOmroep Verkeersbuis.#boodschap_sectie != ALLE_SECTIES\n  ) {\n_sf_sectie[].#stand
+    = UIT;;\n    Omroep Verkeersbuis._sf_sectie[#boodschap_sectie].#stand = AAN;;\n
+    \   Omroep Verkeersbuis.#gebruiksmode = BOODSCHAP_AFSPELEN;;\n  }\n}"
+Omroep Verkeersbuis_StopOmroepVerkeersbuis:
+  name: Omroep Verkeersbuis_StopOmroepVerkeersbuis
+  description: Stop met live toespreken en boodschap afspelen in deze verkeersbuis.
+  actie:
+  - '#gebruiksmode := uit #boodschap_continueren := nee'
+  code: |-
+    function Omroep Verkeersbuis_Omroep Verkeersbuis_StopOmroepVerkeersbuis(id) {
+      const Omroep Verkeersbuis = AIM(id);
+      return #gebruiksmode := uit #boodschap_continueren := nee
+    }
+components:
+  schemas:
+    Verkeersbuis:
+      operations:
+        setOpen:
+          description: dfgsdfgsdfgsdf
+          code: "\n                Verkeersbuis.stand = 'open';\n                "
+          acties:
+          - conditie:
+            - test = ja
+            - test = ja
+            acties:
+            - setTest(ja)
+            - setTest(ja)
+            - setTest(ja)
+          - conditie:
+            - test = ja
+            - test = ja
+            acties:
+            - setTest(ja)
+            - setTest(ja)
+            - setTest(ja)
+        setDicht:
+          description: dfgsdfgsdfgsdf
+          code: "\n                Verkeersbuis.stand = 'open';\n                "
+...

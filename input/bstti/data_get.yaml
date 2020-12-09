@@ -1,0 +1,38 @@
+---
+components:
+  schemas:
+    Hoogtedetector:
+      properties:
+        '#beschikbaarheid':
+          description: |
+            Geeft de beschikbaarheid van de functie aan. MAX
+          enum:
+          - niet_beschikbaar
+          - beperkt_beschikbaar
+          - beschikbaar
+          control:
+          - state:
+            - _lfv_hd.#bestuurbaar = nee || _lfv_hd.#storingen[i] = STORING_DETECTIE
+            value: niet_beschikbaar
+          - state:
+            - _lfv_hd.#bestuurbaar = ja
+            - _lfv_hd.#storingen = {}
+            value: beschikbaar
+          - state:
+            - overige situaties
+            value: beperkt_beschikbaar
+bstti:
+  BSTTI#8749:
+    nr: BSTTI#8749
+    line: "#beschikbaarheid: niet_beschikbaar | beperkt_beschikbaar | beschikbaar\nGeeft
+      de beschikbaarheid van de functie aan. MAX\n\nConditie: _lfv_hd.#bestuurbaar
+      = nee || _lfv_hd.#storingen[i] = STORING_DETECTIE \nWaarde: niet_beschikbaar
+      \nConditie: _lfv_hd.#bestuurbaar = ja &&\n  _lfv_hd.#storingen = {} \nWaarde:
+      beschikbaar \nConditie: overige situaties \nWaarde: beperkt_beschikbaar"
+    path:
+    - Functies van een Verkeersbuis
+    - Hoogtedetectie-functies
+    - Hoogtedetector
+    - Variabelen
+    style: ""
+...

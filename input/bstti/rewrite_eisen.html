@@ -1,0 +1,428 @@
+<html>
+<head>
+  <link rel="stylesheet" href="/src/css/web.css" />
+  <link rel="stylesheet" href="/src/css/icon.css" />
+  <script src="/api/src/js/aim.js"></script>
+  <script src="/api/src/js/web.js"></script>
+  <style>
+  html,body{
+    height:100%;
+  }
+  pre {
+    margin:0;
+    padding:5px;
+    border:solid 1px #ccc;
+    white-space: pre-wrap;
+  }
+  pre div {
+    font: inherit;
+  }
+  .main>div{
+    flex-basis: 50%;
+  }
+  </style>
+  <script>
+  function ucfirst(str) {
+    return str[0].toUpperCase() + str.substr(1);
+  }
+  function sendconfig(params) {
+    if (params) {
+      this.sendbuf = this.sendbuf || [];
+      this.sendbuf.push(params);
+      progress.max++;
+      return sendconfig();
+    }
+    if (this.xhr) return;
+    if (params = this.sendbuf.shift()) {
+      this.xhr = new AIM.HttpRequest('index.php').query({yaml:params.name}).input(params.content).post().then(event => {
+        progress.value++;
+        console.log(params.name,AIM(params.name));
+        AIM(params.name).innerText = event.target.responseText;
+        this.xhr = null;
+        sendconfig();
+      });
+    } else {
+      progress.value = progress.max = 0;
+    }
+  }
+  function setline(property,str) {
+    // console.log('setline', property.description, str);
+    return property.description = property.description.replace(str, '').split(/\n/).filter(Boolean).join('\n').trim();
+  }
+
+  constant_values = [
+    'ja',
+    'nee',
+    'detector_disabled',
+  ]
+
+  function get_config(row,save){
+    var config, js, api;
+    ['config','aim','js'].forEach(id => AIM(id).innerText = '');
+    if (row.path.includes('Configuratie-elementen')) {
+      var line = row.line;
+      var match = line.match(/^(_\w+)\s(.*)/);
+      if (match) {
+        var config = {components:{schemas:{}}};
+        var index = row.path.indexOf('Configuratie-elementen');
+        var schemaName = row.path[index-1];
+        schemaName = schemaName.replace(/ /g,'_',schemaName);
+        var schema = config.components.schemas[schemaName] = {};
+        var properties = schema.properties = {};
+        var name = match[1];
+        var property = properties[name] = {};
+        property.description = match[2];
+      }
+    } else if (row.path.includes('Variabelen')) {
+      var line = row.line;
+      var match = line.match(/^(#\w+):(.*)/ms);
+      if (match) {
+        var config = {components:{schemas:{}}};
+        var index = row.path.indexOf('Variabelen');
+        var schemaName = row.path[index-1];
+        schemaName = schemaName.replace(/ /g,'_',schemaName);
+        var schema = config.components.schemas[schemaName] = {};
+        var properties = schema.properties = {};
+        var [str,name,description] = match;
+        var property = properties[name] = {};
+        property.description = description;
+        line = property.description = property.description.replace(/:/,':\n').trim();
+        var match = line.match(/^\w+[\s\|\s\w]+$/gm);
+        if (match) {
+          property.enum = match[0].split('|');
+          property.enum = property.enum.map(val => val.trim());
+          line = setline(property, match[0]);
+          property.enum.forEach(key => {
+            if (!constant_values.includes(key)) constant_values.push(key);
+            var regex = new RegExp(`^(${key})\\s(?=\\w)(.*)`,'m');
+            var match = line.match(regex);
+            if (match) {
+              property.options = property.options || {};
+              property.options[key] = {description: ucfirst(match[2])};
+              line = setline(property, match[0]);
+            }
+          });
+        }
+        var match = property.description.split(/^Conditie:\s/gms);
+        if (match.length>1) {
+          property.description = match.shift();
+          property.waarde = match.map(line => {
+            let [als,dan] = line.split(/Waarde: /);
+            als = als.trim();
+            if (['*','overige situaties'].includes(als)) return dan.trim();
+            return {als: als, dan: dan.trim() };
+          });
+        }
+        // console.log(match);
+      }
+    } else if (row.path.includes('Bedieningen')) {
+      var line = row.line;
+      var match = line.match(/^(\w+)\(([\w\s]*)\)\s*(.*)/ms);
+      if (match) {
+        var config = {components:{schemas:{}}};
+        var api = {paths:{}};
+        var index = row.path.indexOf('Bedieningen');
+        var schemaName = row.path[index-1];
+        var schema = config.components.schemas[schemaName] = {};
+        var [str,name,par,description] = match;
+        var properties = schema.operations = {};
+        var property = properties[name] = {};
+
+        api.paths[`/${schemaName}(id)/${name}()`] = {
+          post: api_property = {
+            operationId : `${schemaName}_${name}(id)`,
+          }
+        };
+
+        property.description = description;
+        if (par) property.params = par;
+        var match = property.description.split(/^Conditie:\s/gms);
+        if (match.length>1) {
+          property.description = match.shift().trim().split(/\n/g).filter(Boolean).join(' ');
+          property.actie = match.map(line => {
+            let [als,dan] = line.split(/Acties: /);
+            // als = als.trim().split(/&&/g).map(str => str.trim());
+            als = als.trim();//.replace(/&&/g, '\n&&');
+            if (['*','overige situaties'].includes(als)) return dan.trim();
+            // if (['*','overige situaties'].includes(als)) return {als: true, dan: dan.trim().split(/\n/g)};
+            let par = {als: als };
+            if (dan) par.dan = dan.trim().split(/\n/g);
+            return par;
+          });
+          var js = `function ${schemaName}_${name}(id) {\n  const ${schemaName} = AIM(id);\n  ${property.actie.map(actie => {
+            if (typeof actie === 'string') {
+              return actie;
+            }
+
+            let als = actie.als ? '    ' + actie.als : '';
+            als = als.replace('&&','&&\n   ');
+            // als = als.replace(/([#\w]+\.[#\w]+)/gs,`${schemaName}.$1`);
+            als = als.replace(/(\s)([#\w]+)/gs, function(p0,p1,p2) {
+              if (constant_values.includes(p2)) return p1+p2;
+              return p1+`${schemaName}.${p2}`;
+            });
+
+            als = als.replace(/\s*=\s*/gs,' === ');
+            als = als.replace(/\s*<>\s*/gs,' != ');
+
+            let dan = actie.dan ? '    ' + actie.dan.join(';\n    ') : '';
+            dan = dan.replace(/\s*:=\s*/gs,' = ');
+            // dan = dan.replace(/([#\w]+\.[#\w]+)/gs,`${schemaName}.$1`);
+            dan = dan.replace(/(\s)([#\w]+)/gs, function(p0,p1,p2) {
+              if (constant_values.includes(p2)) return p1+p2;
+              return p1+`${schemaName}.${p2}`;
+            });
+            return `if (\n${als}\n  ) {\n${dan};\n  }`;
+          }).join(' else ')}\n}`;
+          AIM('js').innerText = js;
+        }
+      }
+    } else if (row.path.includes('Besturingen')) {
+      var line = row.line;
+      var match = line.match(/^(\w+)\(([\w\s:\|]*)\)\s*(.*)/ms);
+      if (match) {
+        var config = {components:{schemas:{}}};
+        var index = row.path.indexOf('Besturingen');
+        var schemaName = row.path[index-1];
+        var schema = config.components.schemas[schemaName] = {};
+        var properties = schema.operations = {};
+        var [str,name,par,description] = match;
+        var property = properties[name] = {};
+        property.description = description;
+        if (par) property.params = par;
+        var match = property.description.split(/^Conditie:\s/gms);
+        if (match.length>1) {
+          property.description = match.shift().trim().split(/\n/g).filter(Boolean).join(' ');
+          property.actie = match.map(line => {
+            let [als,dan] = line.split(/Acties: /);
+            // als = als.trim().split(/&&/g).map(str => str.trim());
+            als = als.trim();//.replace(/&&/g, '\n&&');
+            if (['*','overige situaties'].includes(als)) return dan.trim();
+            // if (['*','overige situaties'].includes(als)) return {als: true, dan: dan.trim().split(/\n/g)};
+            let par = {als: als };
+            if (dan) par.dan = dan.trim().split(/\n/g);
+            return par;
+          });
+        }
+      }
+    } else if (row.path.includes('Autonome processen')) {
+      var line = row.line;
+      var match = line.match(/^(\*\w+)\s*(.*)/ms);
+      if (match) {
+        var config = {components:{schemas:{}}};
+        var index = row.path.indexOf('Besturingen');
+        var schemaName = row.path[index-1];
+        var schema = config.components.schemas[schemaName] = {};
+        var properties = schema.operations = {};
+        var [str,name,description] = match;
+        var property = properties[name] = {};
+        property.description = description;
+        if (par) property.params = par;
+        var match = property.description.split(/^Conditie:\s/gms);
+        if (match.length>1) {
+          property.description = match.shift().trim().split(/\n/g).filter(Boolean).join(' ');
+          property.actie = match.map(line => {
+            let [als,dan] = line.split(/Acties: /);
+            // als = als.trim().split(/&&/g).map(str => str.trim());
+            als = als.trim();//.replace(/&&/g, '\n&&');
+            let par = {als: als };
+            if (dan) par.dan = dan.trim().split(/\n/g);
+            return par;
+          });
+        }
+      }
+    } else if (row.path.includes('Signaleringen')) {
+      var line = row.line;
+      var match = line.match(/^(!\w+)\s(.*)/ms);
+      if (match) {
+        var config = {components:{schemas:{}}};
+        var index = row.path.indexOf('Signaleringen');
+        var schemaName = row.path[index-1];
+        var schema = config.components.schemas[schemaName] = {};
+        var properties = schema.properties = {};
+        var [str,name,par,description] = match;
+        var property = properties[name] = {};
+      }
+    } else {
+      var schemaName = row.path[1];
+      schemaName = schemaName.replace(/ /g,'_',schemaName);
+      var split = row.line.split(/(?=^#[\w\[\]\.\,\s]+:)/gm);
+      split.shift();
+      if (split.length) {
+        var config = {components:{schemas:{}}};
+        var schema = config.components.schemas[schemaName] = {};
+        var properties = schema.properties = {};
+        split.forEach(line => {
+          line = line.replace(/(:)\s+/,'$1\n');
+          var match = line.match(/^(#[\w\[\]\.\,\s]+):/);
+          var name = match[1].replace(/^#/,'');
+          let property = properties[name] = { bstti: row.nr};
+          property.title = match[1];
+          property.description = line;
+          line = setline(property, match[0]);
+          var match = line.match(/^\w+[\s\|\s\w]+$/gm);
+          if (match) {
+            property.enum = match[0].split('|');
+            property.enum = property.enum.map(val => val.trim());
+            line = setline(property, match[0]);
+            property.enum.forEach(key => {
+              var regex = new RegExp(`^(${key})\\s(?=\\w)(.*)`,'m');
+              var match = line.match(regex);
+              if (match) {
+                property.options = property.options || {};
+                property.options[match[1]] = {description: ucfirst(match[2])};
+                line = setline(property, match[0]);
+              }
+            });
+          }
+          property.description = property.description.replace(/\n/g,' ');
+        });
+      } else {
+        var split = row.line.split(/(?=^\w+\()/gm);
+        split.shift();
+        if (split.length) {
+          var config = {components:{schemas:{}}};
+          var schema = config.components.schemas[schemaName] = {};
+          var properties = schema.operations = {};
+          split.forEach(line => {
+            var match = line.match(/^(\w+)\((.*)\)/);
+            let property = properties[match[1]] = { bstti: row.nr};
+            property.description = match[2];
+            if (match[2]) {
+              property.params = match[2].split(',');
+              property.params = property.params.map(par => {
+                let arr = par.split(': ');
+                let options = arr.pop().split('|');
+                options = options.map(val => val.trim());
+                let name = arr.pop();
+                params = {};
+                if (name) params.name = name;
+                params.enum = options;
+                return params;
+              });
+            }
+            line = setline(property, match[0]);
+          });
+        } else {
+          var split = row.line.split(/(?=^[A-Z_]+\s.*)/gm);
+          split.shift();
+          if (split.length) {
+            var config = {components:{schemas:{}}};
+            var schema = config.components.schemas[schemaName] = {};
+            var properties = schema.properties = {};
+            properties.storingen = split.map(storing => {
+              let match = storing.match(/^([A-Z_]+)\s(.*)/);
+              return {
+                name: match[1],
+                description: match[2],
+              }
+            });
+          }
+        }
+      }
+    }
+    if (save) {
+      if (config) {
+        sendconfig({name:'config',content:config});
+      }
+      if (api) {
+        sendconfig({name:'api',content:api});
+      }
+    }
+    return config;
+  }
+  AIM.extend({
+    on:{
+      init() {
+        new AIM.HttpRequest('./?make=eisen').get().then(event => {
+          console.log(event.body);
+          event.body.forEach(row => {
+            row.nr = Number(row.nr);
+            // row.line = row.line.replace(/(\.|:)\s+/,'$1\n');
+            row.line = row.line.replace(/(\.|\):)\s+/g,'$1\n');
+            row.line = row.line.replace(/\s\s/g,' ');
+            row.line = row.line.replace(/(Conditie:|Waarde:)/g,'\n$1');
+            row.line = row.line.replace(/(\s\|\s\w+)\s(?=\w)/g,'$1\n');
+            row.line = row.line.replace(/(\w+\(.*\))\s/gs,'$1\n');
+            var config = get_config(row);
+            spec.createElement('div', [
+              ['div', '', row.path.join('/') + '/bstti#' + row.nr],
+              ['pre', 'aco', row.line, {
+                row: row,
+                config: config,
+                style: config ? '' : 'background-color: #eee;',
+                contenteditable: true,
+                onfocus(event) {
+                  get_config(this.row, true);
+                },
+                onkeyup(event) {
+                  if (this.row.line != this.innerText) {
+                    this.row.line = this.innerText;
+                    get_config(this.row, true);
+                  }
+                },
+              }]
+            ]);
+          })
+          constant_values = constant_values.sort();
+          console.log('constant_values',constant_values);
+        });
+      }
+    }
+  })
+  //
+  // const ja = 'ja';
+  // const nee = 'nee';
+  // const detector_disabled = 'detector_disabled';
+  //
+  // AIM.ref[1] = {
+  //   _lfv_hd: {
+  //     bestuurbaar: 'ja',
+  //     hoogte_overschrijding: 'disabled',
+  //     SetHoogteOverschrijding(par) {
+  //       status = par;
+  //       console.log('SetHoogteOverschrijding', par);
+  //     }
+  //   }
+  // }
+  //
+  // Hoogtedetector = function(id) {
+  //   const Hoogtedetector = AIM.ref[1];
+  //   return {
+  //     SetEnabled() {
+  //       Hoogtedetector.enabled = ja;
+  //     },
+  //     SetDisabled() {
+  //       if (
+  //         Hoogtedetector._lfv_hd.bestuurbaar = ja &&
+  //         Hoogtedetector._lfv_hd.hoogte_overschrijding != detector_disabled
+  //       ) {
+  //         Hoogtedetector._lfv_hd.SetHoogteOverschrijding(detector_disabled);
+  //         Hoogtedetector.enabled = nee;
+  //       } else if (
+  //         Hoogtedetector._lfv_hd.bestuurbaar = nee
+  //       ) {
+  //         Hoogtedetector.enabled = nee;
+  //       }
+  //     }
+  //   }
+  // };
+  // Hoogtedetector(1).SetEnabled();
+  // Hoogtedetector(1).SetDisabled();
+  // console.log(AIM.ref[1]);
+  </script>
+</head>
+<body class="col">
+  <div class="row">
+    <progress id="progress"></progress>
+  </div>
+  <div class="row aco main" style="height:0;">
+    <div id="spec" class="oa"></div>
+    <div class="oa">
+      <pre id="config"></pre>
+      <pre id="api"></pre>
+      <pre id="js"></pre>
+    </div>
+  </div>
+</body>
+</html>
