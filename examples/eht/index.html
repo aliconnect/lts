@@ -15,8 +15,13 @@
 <body class='col'>
 	<button onclick="subwindows_close()">CLOSE</button>
 	<script>
-	const options = 'resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,directories=no,status=yes';
+	const options = 'resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,directories=no,status=no';
 	const urls = [
+		[
+			'../demo',
+			'Demo',
+			'width=1700,height=1080,top=0,left=0,' + options
+		],
 		[
 			'http://localhost:9002',
 			'GUI Local',

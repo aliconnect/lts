@@ -20,9 +20,9 @@ if "%run%"=="1" (
 
 :node
 cls
-node %LIB%\%1 --config-http-port=%2 %3 %4 %5 %6 %7 %8 %9
+node %LIB%\%1 --http-port=%2 %3 %4 %5 %6 %7 %8 %9
 pause
 goto node
 
 :start
-START "" node %LIB%\%1 --config-http-port=%2 %3 %4 %5 %6 %7 %8 %9
+START "" node %LIB%\%1 --http-port=%2 %3 %4 %5 %6 %7 %8 %9

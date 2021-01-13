@@ -1246,11 +1246,11 @@ VerkeersbuisVerlichting.prototype.SetZoneAutomatischeRegelingHandbedieningsStand
   */
 VerkeersbuisVerlichting.prototype.SetZoneOpAutobedieningZonderWijzigingen = function () {
   if (
-    VerkeersbuisVerlichting.zone_bedieningswijze !== AUTO
+    this.zone_bedieningswijze !== AUTO
   ) {
-    VerkeersbuisVerlichting.zone_auto_autoregeling = VerkeersbuisVerlichting.zone_hand_autoregeling;
-    VerkeersbuisVerlichting.zone_auto_stand = VerkeersbuisVerlichting.zone_hand_stand;
-    VerkeersbuisVerlichting.zone_bedieningswijze = AUTO;
+    this.zone_auto_autoregeling = this.zone_hand_autoregeling;
+    this.zone_auto_stand = this.zone_hand_stand;
+    this.zone_bedieningswijze = AUTO;
   }
 };
 /** @function VerkeersbuisVerlichting.SetZoneAutomatischeRegelingAutobedieningsStand

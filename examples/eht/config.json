@@ -1,10 +1,28 @@
 {
-  "config": {
-    "debug": true,
+  "debug": true,
+  "client": {
     "aim": {
-      "servers": [
-        {"url": "https://rws.aliconnect.nl/tms/eht/api"}
-      ]
+      "auth": {
+        "servers": [
+          {
+            "url": "https://login.aliconnect.nl/api"
+          }
+        ]
+      },
+      "ws": {
+        "servers": [
+          {
+            "url": "wss://aliconnect.nl:444"
+          }
+        ]
+      },
+      "api": {
+        "servers": [
+          {
+            "url": "https://rws.aliconnect.nl/tms/eht/api"
+          }
+        ]
+      }
     }
   }
 }
