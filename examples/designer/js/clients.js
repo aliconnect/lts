@@ -3,9 +3,10 @@
     rood: { color: 'red'},
     groen: { color: 'green'},
     geel_knipperen: { color: 'yellow'},
+    gedoofd: { color: 'gray'},
   };
 
-  Aim.extend({
+  $$().extend({
     dms: {
       aim: {
         client_id: "6e6f5cb3-245b-4433-9e76-b9cc8e956899",
@@ -2910,12 +2911,12 @@
                   filter: 1,
                   options: {
                     run: {
-                      title: "Stopping",
+                      title: "Run",
                       color: "green"
                     },
-                    stopped: {
-                      title: "Clearing",
-                      color: "green"
+                    stop: {
+                      title: "Stop",
+                      color: "red"
                     }
                   }
                 },
@@ -3394,7 +3395,8 @@
                 },
                 Verkeerslicht: {
                   schema: "Verkeerslicht",
-                  type: "array"
+                  type: "array",
+                  required: 1,
                 },
                 Lfv_verkeerslichten: {
                   stereotype: "configuratie_element",
@@ -3409,9 +3411,8 @@
                     "Configuratie-elementen"
                   ]
                 },
-                Sf_verkeerslicht: {
+                sf_Verkeerslicht: {
                   stereotype: "configuratie_element",
-                  type: "array",
                   summary: "_sf_verkeerslicht[]",
                   description: "De lijst met subfuncties Verkeerslicht voor deze functie.",
                   bsttiName: "_sf_verkeerslicht[]",
@@ -3421,7 +3422,10 @@
                     "Verkeersgeleiding-functies",
                     "Verkeerslichten",
                     "Configuratie-elementen"
-                  ]
+                  ],
+                  schema: 'Verkeerslicht',
+                  type: "array",
+
                 },
                 Lfv_verkeerslicht: {
                   stereotype: "configuratie_element",
@@ -3434,7 +3438,7 @@
                     "Verkeersgeleiding-functies",
                     "Verkeerslichten",
                     "Configuratie-elementen"
-                  ]
+                  ],
                 },
                 Beschikbaarheid: {
                   stereotype: "variabele",
@@ -3478,6 +3482,7 @@
                     "Variabelen"
                   ],
                   enum: verkeerslicht_stand_enum,
+                  defaultValue: 'gedoofd',
                   // type: 'string',
                   // format: 'radio',
                   rules: [

@@ -1,6 +1,6 @@
-(function() {
+$$().on('ready', () => {
   const temp = {};
-  temp.verkeerslicht = { schema: 'Verkeerslicht' };
+  temp.verkeerslicht = { schema: 'Verkeerslicht', State: 'stop' };
   temp.verkeerslichten = { schema: 'Verkeerslichten', children: [
     temp.verkeerslicht,
     temp.verkeerslicht,
@@ -15,17 +15,13 @@
     temp.verkeersbuis,
   ] };
 
-  Aim.extend({
-    data: {
-      schema: 'Folder', children: [
-        { schema: 'Sample', title: 'Samples' },
-        JSON.parse(JSON.stringify(temp.tunnel)),
-        { schema: 'Test', title: 'Groep', children: [
-          { schema: 'Test', title: 'Een', state: 'run', categories: 'green', endDateTime:'2021-01-13' },
-          { schema: 'Test', title: 'Twee', state: 'stop', categories: 'green,red', startDateTime:'2021-01-13' },
-          { schema: 'Test', title: 'Drie' },
-        ]  },
-      ]
-    },
-  });
-})();
+  $$().data({schema: 'Folder', children: [
+    { schema: 'Sample', title: 'Samples' },
+    JSON.parse(JSON.stringify(temp.tunnel)),
+    { schema: 'Test', title: 'Groep', children: [
+      { schema: 'Test', title: 'Een', State: 'run', categories: 'green', endDateTime:'2021-01-13' },
+      { schema: 'Test', title: 'Twee', State: 'stop', categories: 'green,red', startDateTime:'2021-01-13' },
+      { schema: 'Test', title: 'Drie' },
+    ]},
+  ]});
+});
