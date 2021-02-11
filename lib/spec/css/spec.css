@@ -1,0 +1,44 @@
+li.h2 {
+  margin-left:10px;
+  font-size: 0.9em;
+}
+li.h3 {
+  margin-left:20px;
+  font-size: 0.8em;
+}
+li.h4 {
+  margin-left:30px;
+  font-size: 0.7em;
+}
+table.properties {
+  font-size: 0.8em;
+  table-layout: fixed;
+}
+table.properties tr>:first-child {
+  width: 6cm;
+  color:#999;
+}
+table.properties .code {
+  white-space: pre-wrap;
+}
+table.keys {
+  font-size: 0.8em;
+}
+table,tr,td {
+  border-collapse: collapse;
+  vertical-align: top;
+  border: none;
+}
+ul.properties {
+  list-style: '- ';
+  padding-left:15px;
+}
+.gui {
+  display:block;
+  height:50px;
+  border: solid 1px #ccc;
+}
+a.code {
+  /* text-decoration: none;
+  color: inherit; */
+}
